@@ -1,0 +1,193 @@
+version: 2
+
+sources:
+  - name: payments_raw
+    database: prd-dagen
+    schema: payments_v1
+    description: Raw payment data from Airbyte CDC pipeline
+    tables:
+      - name: customers
+        description: Raw customer master data with CDC records
+        columns:
+          - name: customer_id
+            description: Unique customer identifier (PK)
+          - name: email
+            description: Customer email address
+          - name: customer_type
+            description: Type of customer (INDIVIDUAL, BUSINESS)
+          - name: kyc_status
+            description: KYC verification status
+          - name: risk_profile
+            description: Customer risk classification (LOW, MEDIUM, HIGH, CRITICAL)
+          - name: phone_number
+            description: Customer phone number
+          - name: address
+            description: Customer address
+          - name: created_at
+            description: Record creation timestamp
+          - name: updated_at
+            description: Record last update timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+          - name: _airbyte_raw_id
+            description: Airbyte internal ID
+          - name: _airbyte_meta
+            description: Airbyte metadata
+          - name: _airbyte_generation_id
+            description: Airbyte generation ID
+          - name: _ab_cdc_lsn
+            description: CDC LSN (Log Sequence Number)
+          - name: _ab_cdc_updated_at
+            description: CDC update timestamp
+          - name: _ab_cdc_deleted_at
+            description: CDC delete timestamp
+
+      - name: transactions
+        description: Raw transaction data with CDC records
+        columns:
+          - name: transaction_id
+            description: Unique transaction identifier (PK)
+          - name: reference
+            description: Transaction reference number
+          - name: debtor_customer_id
+            description: Debtor customer ID (FK)
+          - name: creditor_customer_id
+            description: Creditor customer ID (FK)
+          - name: payment_method_id
+            description: Payment method used (FK)
+          - name: amount
+            description: Transaction amount
+          - name: currency
+            description: Transaction currency code
+          - name: status
+            description: Transaction status
+          - name: created_at
+            description: Record creation timestamp
+          - name: updated_at
+            description: Record last update timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+
+      - name: payment_methods
+        description: Raw payment method data with CDC records
+        columns:
+          - name: payment_method_id
+            description: Unique payment method identifier (PK)
+          - name: customer_id
+            description: Associated customer ID (FK)
+          - name: method_type
+            description: Type of payment method
+          - name: details
+            description: Payment method details
+          - name: is_default
+            description: Whether this is default method
+          - name: created_at
+            description: Record creation timestamp
+          - name: updated_at
+            description: Record last update timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+
+      - name: fees
+        description: Raw fee data with CDC records
+        columns:
+          - name: fee_id
+            description: Unique fee identifier (PK)
+          - name: transaction_id
+            description: Associated transaction ID (FK)
+          - name: amount
+            description: Fee amount
+          - name: currency
+            description: Fee currency code
+          - name: fee_type
+            description: Type of fee
+          - name: created_at
+            description: Record creation timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+
+      - name: refunds
+        description: Raw refund data with CDC records
+        columns:
+          - name: refund_id
+            description: Unique refund identifier (PK)
+          - name: original_transaction_id
+            description: Original transaction ID (FK)
+          - name: amount
+            description: Refund amount
+          - name: currency
+            description: Refund currency code
+          - name: reason
+            description: Refund reason
+          - name: status
+            description: Refund status
+          - name: created_at
+            description: Record creation timestamp
+          - name: updated_at
+            description: Record last update timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+
+      - name: disputes
+        description: Raw dispute data with CDC records
+        columns:
+          - name: dispute_id
+            description: Unique dispute identifier (PK)
+          - name: transaction_id
+            description: Associated transaction ID (FK)
+          - name: reason
+            description: Dispute reason
+          - name: amount
+            description: Dispute amount
+          - name: currency
+            description: Dispute currency code
+          - name: status
+            description: Dispute status
+          - name: created_at
+            description: Record creation timestamp
+          - name: updated_at
+            description: Record last update timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+
+      - name: payouts
+        description: Raw payout data with CDC records
+        columns:
+          - name: payout_id
+            description: Unique payout identifier (PK)
+          - name: recipient_customer_id
+            description: Recipient customer ID (FK)
+          - name: amount
+            description: Payout amount
+          - name: currency
+            description: Payout currency code
+          - name: status
+            description: Payout status
+          - name: scheduled_at
+            description: Scheduled execution timestamp
+          - name: executed_at
+            description: Actual execution timestamp
+          - name: created_at
+            description: Record creation timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte
+
+      - name: mandates
+        description: Raw mandate data with CDC records
+        columns:
+          - name: mandate_id
+            description: Unique mandate identifier (PK)
+          - name: customer_id
+            description: Associated customer ID (FK)
+          - name: payment_method_id
+            description: Associated payment method ID (FK)
+          - name: reference
+            description: Mandate reference
+          - name: status
+            description: Mandate status
+          - name: created_at
+            description: Record creation timestamp
+          - name: updated_at
+            description: Record last update timestamp
+          - name: _airbyte_extracted_at
+            description: Timestamp when record was extracted by Airbyte

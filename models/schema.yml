@@ -1,0 +1,522 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: |
+      Cleaned and deduplicated customer master data.
+      - Removes CDC duplicates by keeping the latest record per customer_id
+      - Validates critical fields (email, customer_type, kyc_status, risk_profile)
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per customer
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: customer_id
+        description: Unique customer identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: email
+        description: Customer email address
+        tests:
+          - not_null
+      
+      - name: customer_type
+        description: Type of customer (INDIVIDUAL, BUSINESS)
+        tests:
+          - not_null
+      
+      - name: kyc_status
+        description: KYC verification status
+      
+      - name: risk_profile
+        description: Customer risk classification (LOW, MEDIUM, HIGH, CRITICAL)
+      
+      - name: phone_number
+        description: Customer phone number
+      
+      - name: address
+        description: Customer address
+      
+      - name: created_at
+        description: Record creation timestamp
+      
+      - name: updated_at
+        description: Record last update timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: has_valid_type
+        description: Flag indicating customer_type is not null
+      
+      - name: has_kyc_status
+        description: Flag indicating kyc_status is not null
+      
+      - name: has_risk_profile
+        description: Flag indicating risk_profile is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_transactions
+    description: |
+      Cleaned and deduplicated transaction data.
+      - Removes CDC duplicates by keeping the latest record per transaction_id
+      - Validates transaction amounts (must be > 0)
+      - Validates required fields (currency, status)
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per transaction
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY transaction_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: reference
+        description: Transaction reference number
+      
+      - name: debtor_customer_id
+        description: Debtor customer ID (FK to dim_customers)
+        tests:
+          - not_null
+      
+      - name: creditor_customer_id
+        description: Creditor customer ID (FK to dim_customers)
+        tests:
+          - not_null
+      
+      - name: payment_method_id
+        description: Payment method used (FK to dim_payment_methods)
+      
+      - name: amount
+        description: Transaction amount (must be > 0)
+        tests:
+          - not_null
+      
+      - name: currency
+        description: Transaction currency code
+        tests:
+          - not_null
+      
+      - name: status
+        description: Transaction status
+        tests:
+          - not_null
+      
+      - name: created_at
+        description: Record creation timestamp
+      
+      - name: updated_at
+        description: Record last update timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: transaction_date
+        description: Transaction date (extracted from created_at)
+      
+      - name: has_valid_amount
+        description: Flag indicating amount > 0
+      
+      - name: has_valid_currency
+        description: Flag indicating currency is not null
+      
+      - name: has_valid_status
+        description: Flag indicating status is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_payment_methods
+    description: |
+      Cleaned and deduplicated payment method data.
+      - Removes CDC duplicates by keeping the latest record per payment_method_id
+      - Validates customer and method_type relationships
+      - Standardizes method_type to uppercase
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per payment method
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY payment_method_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: payment_method_id
+        description: Unique payment method identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: customer_id
+        description: Associated customer ID (FK to dim_customers)
+        tests:
+          - not_null
+      
+      - name: method_type
+        description: Type of payment method (standardized to uppercase)
+        tests:
+          - not_null
+      
+      - name: details
+        description: Payment method details (masked for security)
+      
+      - name: is_default
+        description: Whether this is the default method for customer
+      
+      - name: created_at
+        description: Method creation timestamp
+      
+      - name: updated_at
+        description: Method last update timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: has_valid_method_type
+        description: Flag indicating method_type is not null
+      
+      - name: has_valid_customer
+        description: Flag indicating customer_id is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_fees
+    description: |
+      Cleaned and deduplicated fee data.
+      - Removes CDC duplicates by keeping the latest record per fee_id
+      - Validates fee amounts (must be >= 0)
+      - Validates currency and transaction_id relationships
+      - Standardizes fee_type to uppercase
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per fee
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY fee_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: fee_id
+        description: Unique fee identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: transaction_id
+        description: Associated transaction ID (FK to fct_transactions)
+        tests:
+          - not_null
+      
+      - name: amount
+        description: Fee amount (must be >= 0)
+        tests:
+          - not_null
+      
+      - name: currency
+        description: Fee currency code
+        tests:
+          - not_null
+      
+      - name: fee_type
+        description: Type of fee (standardized to uppercase)
+      
+      - name: created_at
+        description: Fee creation timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: fee_date
+        description: Fee date (extracted from created_at)
+      
+      - name: has_valid_amount
+        description: Flag indicating amount >= 0
+      
+      - name: has_valid_currency
+        description: Flag indicating currency is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_refunds
+    description: |
+      Cleaned and deduplicated refund data.
+      - Removes CDC duplicates by keeping the latest record per refund_id
+      - Validates refund amounts (must be > 0)
+      - Validates currency and original_transaction_id relationships
+      - Standardizes reason and status to uppercase
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per refund
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY refund_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: refund_id
+        description: Unique refund identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: original_transaction_id
+        description: Original transaction ID (FK to fct_transactions)
+        tests:
+          - not_null
+      
+      - name: amount
+        description: Refund amount (must be > 0)
+        tests:
+          - not_null
+      
+      - name: currency
+        description: Refund currency code
+        tests:
+          - not_null
+      
+      - name: reason
+        description: Reason for refund (standardized to uppercase)
+      
+      - name: status
+        description: Refund status (standardized to uppercase)
+      
+      - name: created_at
+        description: Refund creation timestamp
+      
+      - name: updated_at
+        description: Refund last update timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: refund_date
+        description: Refund date (extracted from created_at)
+      
+      - name: has_valid_amount
+        description: Flag indicating amount > 0
+      
+      - name: has_valid_currency
+        description: Flag indicating currency is not null
+      
+      - name: has_valid_status
+        description: Flag indicating status is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_disputes
+    description: |
+      Cleaned and deduplicated dispute data.
+      - Removes CDC duplicates by keeping the latest record per dispute_id
+      - Validates dispute amounts (must be > 0)
+      - Validates currency and transaction_id relationships
+      - Standardizes reason and status to uppercase
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per dispute
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY dispute_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: dispute_id
+        description: Unique dispute identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: transaction_id
+        description: Associated transaction ID (FK to fct_transactions)
+        tests:
+          - not_null
+      
+      - name: reason
+        description: Reason for dispute (standardized to uppercase)
+      
+      - name: amount
+        description: Disputed amount (must be > 0)
+        tests:
+          - not_null
+      
+      - name: currency
+        description: Dispute currency code
+        tests:
+          - not_null
+      
+      - name: status
+        description: Dispute status (standardized to uppercase)
+      
+      - name: created_at
+        description: Dispute creation timestamp
+      
+      - name: updated_at
+        description: Dispute last update timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: dispute_date
+        description: Dispute date (extracted from created_at)
+      
+      - name: has_valid_amount
+        description: Flag indicating amount > 0
+      
+      - name: has_valid_currency
+        description: Flag indicating currency is not null
+      
+      - name: has_valid_status
+        description: Flag indicating status is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_payouts
+    description: |
+      Cleaned and deduplicated payout data.
+      - Removes CDC duplicates by keeping the latest record per payout_id
+      - Validates payout amounts (must be > 0)
+      - Validates currency and recipient_customer_id relationships
+      - Standardizes status to uppercase
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per payout
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY payout_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: payout_id
+        description: Unique payout identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: recipient_customer_id
+        description: Recipient customer ID (FK to dim_customers)
+        tests:
+          - not_null
+      
+      - name: amount
+        description: Payout amount (must be > 0)
+        tests:
+          - not_null
+      
+      - name: currency
+        description: Payout currency code
+        tests:
+          - not_null
+      
+      - name: status
+        description: Payout status (standardized to uppercase)
+      
+      - name: scheduled_at
+        description: Scheduled execution timestamp
+      
+      - name: executed_at
+        description: Actual execution timestamp
+      
+      - name: created_at
+        description: Payout creation timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: payout_date
+        description: Payout creation date (extracted from created_at)
+      
+      - name: scheduled_date
+        description: Scheduled date (extracted from scheduled_at or created_at)
+      
+      - name: executed_date
+        description: Executed date (extracted from executed_at)
+      
+      - name: has_valid_amount
+        description: Flag indicating amount > 0
+      
+      - name: has_valid_currency
+        description: Flag indicating currency is not null
+      
+      - name: has_valid_status
+        description: Flag indicating status is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: stg_mandates
+    description: |
+      Cleaned and deduplicated mandate data.
+      - Removes CDC duplicates by keeping the latest record per mandate_id
+      - Validates customer_id and payment_method_id relationships
+      - Standardizes status to uppercase
+      - Flags data quality issues for downstream processing
+      
+      **Grain:** One row per mandate
+      **Deduplication:** ROW_NUMBER() OVER (PARTITION BY mandate_id ORDER BY _airbyte_extracted_at DESC)
+    
+    columns:
+      - name: mandate_id
+        description: Unique mandate identifier (PK)
+        tests:
+          - unique
+          - not_null
+      
+      - name: customer_id
+        description: Associated customer ID (FK to dim_customers)
+        tests:
+          - not_null
+      
+      - name: payment_method_id
+        description: Associated payment method ID (FK to dim_payment_methods)
+        tests:
+          - not_null
+      
+      - name: reference
+        description: Mandate reference number
+      
+      - name: status
+        description: Mandate status (standardized to uppercase)
+      
+      - name: created_at
+        description: Mandate creation timestamp
+      
+      - name: updated_at
+        description: Mandate last update timestamp
+      
+      - name: _airbyte_extracted_at
+        description: Timestamp when record was extracted by Airbyte
+      
+      - name: mandate_date
+        description: Mandate creation date (extracted from created_at)
+      
+      - name: has_valid_customer
+        description: Flag indicating customer_id is not null
+      
+      - name: has_valid_payment_method
+        description: Flag indicating payment_method_id is not null
+      
+      - name: has_valid_status
+        description: Flag indicating status is not null
+      
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt

@@ -1,0 +1,21 @@
+name: 'test_midas'
+version: '1.0.0'
+config-version: 2
+
+profile: 'test_midas'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+data-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  test_midas:
+    +materialized: table
+    +schema: test_midas_staging
