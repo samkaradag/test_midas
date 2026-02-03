@@ -1,0 +1,264 @@
+version: 2
+
+models:
+  - name: fct_transactions_denorm
+    description: |\
+      Denormalized transaction fact table with enriched customer, payment method, and fee data.
+      - One row per transaction
+      - Joins stg_transactions with stg_customers (debtor & creditor), stg_payment_methods, and aggregated stg_fees
+      - Includes pre-calculated aggregates (total_fees_count, total_fees_amount, etc.)
+      - Includes risk flags and transaction size categorization
+      
+      **Grain:** One row per transaction
+      **Denormalization:** Enriched with customer and payment method data + aggregated fees
+    
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier (PK)
+      - name: reference
+        description: Transaction reference number
+      - name: debtor_customer_id
+        description: Debtor customer ID (FK)
+      - name: creditor_customer_id
+        description: Creditor customer ID (FK)
+      - name: payment_method_id
+        description: Payment method used (FK)
+      - name: transaction_amount
+        description: Original transaction amount
+      - name: currency
+        description: Transaction currency code
+      - name: status
+        description: Transaction status
+      - name: debtor_email
+        description: Debtor customer email
+      - name: debtor_customer_type
+        description: Debtor customer type (INDIVIDUAL, BUSINESS)
+      - name: debtor_kyc_status
+        description: Debtor KYC verification status
+      - name: debtor_risk_profile
+        description: Debtor risk classification
+      - name: debtor_phone
+        description: Debtor phone number
+      - name: debtor_address
+        description: Debtor address
+      - name: creditor_email
+        description: Creditor customer email
+      - name: creditor_customer_type
+        description: Creditor customer type
+      - name: creditor_kyc_status
+        description: Creditor KYC verification status
+      - name: creditor_risk_profile
+        description: Creditor risk classification
+      - name: creditor_phone
+        description: Creditor phone number
+      - name: creditor_address
+        description: Creditor address
+      - name: method_type
+        description: Payment method type
+      - name: is_default_payment_method
+        description: Whether payment method is default
+      - name: total_fees_count
+        description: Count of associated fees
+      - name: total_fees_amount
+        description: Sum of all associated fees
+      - name: max_fee_amount
+        description: Maximum fee amount
+      - name: min_fee_amount
+        description: Minimum fee amount
+      - name: fee_types
+        description: Array of distinct fee types
+      - name: total_amount_with_fees
+        description: Transaction amount plus total fees
+      - name: transaction_size_category
+        description: Transaction size category (LOW, MEDIUM, HIGH)
+      - name: involves_critical_risk_customer
+        description: Flag indicating if either customer has CRITICAL risk profile
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: fct_customers_360
+    description: |\
+      Denormalized customer 360 view with aggregated payment methods and mandates.
+      - One row per customer
+      - Joins stg_customers with aggregated stg_payment_methods and stg_mandates
+      - Includes pre-calculated aggregates (total_payment_methods, active_mandates_count, etc.)
+      - Includes KYC and risk flags
+      
+      **Grain:** One row per customer
+      **Denormalization:** Customer enriched with aggregated payment methods and mandates
+    
+    columns:
+      - name: customer_id
+        description: Unique customer identifier (PK)
+      - name: email
+        description: Customer email address
+      - name: customer_type
+        description: Customer type (INDIVIDUAL, BUSINESS)
+      - name: kyc_status
+        description: KYC verification status
+      - name: risk_profile
+        description: Risk classification
+      - name: phone_number
+        description: Customer phone number
+      - name: address
+        description: Customer address
+      - name: total_payment_methods
+        description: Count of payment methods for customer
+      - name: default_payment_method_count
+        description: Count of default payment methods
+      - name: payment_method_types
+        description: Array of distinct payment method types
+      - name: last_payment_method_update
+        description: Timestamp of last payment method update
+      - name: total_mandates
+        description: Count of mandates for customer
+      - name: active_mandates_count
+        description: Count of active mandates
+      - name: inactive_mandates_count
+        description: Count of inactive mandates
+      - name: mandate_statuses
+        description: Array of distinct mandate statuses
+      - name: last_mandate_update
+        description: Timestamp of last mandate update
+      - name: is_kyc_verified
+        description: Flag indicating KYC verification status
+      - name: is_high_risk
+        description: Flag indicating if customer has HIGH or CRITICAL risk profile
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: fct_transactions_with_refunds_disputes
+    description: |\
+      Denormalized transaction fact table with aggregated refunds and disputes.
+      - One row per transaction
+      - Joins stg_transactions with aggregated stg_refunds and stg_disputes
+      - Includes pre-calculated metrics (total_refunds_count, total_disputed_amount, etc.)
+      - Includes transaction risk status categorization
+      
+      **Grain:** One row per transaction
+      **Denormalization:** Enriched with aggregated refunds and disputes
+    
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier (PK)
+      - name: reference
+        description: Transaction reference number
+      - name: debtor_customer_id
+        description: Debtor customer ID (FK)
+      - name: creditor_customer_id
+        description: Creditor customer ID (FK)
+      - name: payment_method_id
+        description: Payment method used (FK)
+      - name: transaction_amount
+        description: Original transaction amount
+      - name: currency
+        description: Transaction currency code
+      - name: transaction_status
+        description: Transaction status
+      - name: total_refunds_count
+        description: Count of associated refunds
+      - name: completed_refunds_count
+        description: Count of completed refunds
+      - name: pending_refunds_count
+        description: Count of pending refunds
+      - name: total_refunded_amount
+        description: Sum of all refunded amounts
+      - name: max_refund_amount
+        description: Maximum refund amount
+      - name: min_refund_amount
+        description: Minimum refund amount
+      - name: refund_reasons
+        description: Array of distinct refund reasons
+      - name: refund_statuses
+        description: Array of distinct refund statuses
+      - name: last_refund_update
+        description: Timestamp of last refund update
+      - name: total_disputes_count
+        description: Count of associated disputes
+      - name: open_disputes_count
+        description: Count of open disputes
+      - name: resolved_disputes_count
+        description: Count of resolved disputes
+      - name: total_disputed_amount
+        description: Sum of all disputed amounts
+      - name: max_dispute_amount
+        description: Maximum dispute amount
+      - name: min_dispute_amount
+        description: Minimum dispute amount
+      - name: dispute_reasons
+        description: Array of distinct dispute reasons
+      - name: dispute_statuses
+        description: Array of distinct dispute statuses
+      - name: last_dispute_update
+        description: Timestamp of last dispute update
+      - name: net_transaction_amount
+        description: Transaction amount minus total refunded amount
+      - name: has_refunds
+        description: Flag indicating if transaction has refunds
+      - name: has_disputes
+        description: Flag indicating if transaction has disputes
+      - name: has_refunds_or_disputes
+        description: Flag indicating if transaction has refunds or disputes
+      - name: transaction_risk_status
+        description: Transaction risk status (DISPUTED, PENDING_REFUND, REFUNDED, CLEAN)
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
+
+  - name: fct_payouts_denorm
+    description: |\
+      Denormalized payout fact table with enriched recipient customer data.
+      - One row per payout
+      - Joins stg_payouts with stg_customers (recipient)
+      - Includes recipient customer profile and KYC/risk flags
+      - Includes calculated execution metrics
+      
+      **Grain:** One row per payout
+      **Denormalization:** Enriched with recipient customer data
+    
+    columns:
+      - name: payout_id
+        description: Unique payout identifier (PK)
+      - name: recipient_customer_id
+        description: Recipient customer ID (FK)
+      - name: amount
+        description: Payout amount
+      - name: currency
+        description: Payout currency code
+      - name: status
+        description: Payout status
+      - name: scheduled_at
+        description: Scheduled execution timestamp
+      - name: executed_at
+        description: Actual execution timestamp
+      - name: created_at
+        description: Payout creation timestamp
+      - name: recipient_email
+        description: Recipient customer email
+      - name: recipient_customer_type
+        description: Recipient customer type
+      - name: recipient_kyc_status
+        description: Recipient KYC verification status
+      - name: recipient_risk_profile
+        description: Recipient risk classification
+      - name: recipient_phone
+        description: Recipient phone number
+      - name: recipient_address
+        description: Recipient address
+      - name: days_to_execute
+        description: Days between scheduled and executed timestamp
+      - name: payout_status_category
+        description: Payout status category (EXECUTED, OVERDUE, PENDING)
+      - name: is_successfully_executed
+        description: Flag indicating successful execution
+      - name: recipient_is_high_risk
+        description: Flag indicating if recipient has HIGH or CRITICAL risk profile
+      - name: recipient_is_kyc_verified
+        description: Flag indicating if recipient is KYC verified
+      - name: has_data_quality_issues
+        description: Flag indicating any data quality issues
+      - name: dbt_loaded_at
+        description: Timestamp when record was loaded by dbt
