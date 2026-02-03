@@ -18,8 +18,4 @@ clean-targets:
 models:
   test_midas:
     +materialized: table
-    staging:
-      +schema: test_midas_staging
-    facts:
-      +schema: test_midas_facts
-      +materialized: table
+    +schema: test_midas_staging
