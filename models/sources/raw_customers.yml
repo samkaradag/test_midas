@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw_customers
+    database: prd-dagen
+    schema: payments_v1
+    tables:
+      - name: airbyte_raw_customers
+        description: Raw customer data from Airbyte
+        columns:
+          - name: _airbyte_raw_id
+            description: Airbyte raw ID
+          - name: _airbyte_extracted_at
+            description: When the record was extracted
+          - name: _airbyte_loaded_at
+            description: When the record was loaded
+          - name: _airbyte_data
+            description: Raw JSON data

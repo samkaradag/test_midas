@@ -1,0 +1,5 @@
+database: prd-dagen
+schema: payments_v1
+tables:
+- name: airbyte_raw_customers
+  description: Raw customer data from Airbyte
