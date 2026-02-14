@@ -1,0 +1,336 @@
+version: 2
+
+sources:
+  - name: raw_customers
+    description: Raw payment system data from Airbyte ingestion
+    database: prd-dagen
+    schema: payments_v1
+    tables:
+      - name: customers
+        description: Raw customer records with potential duplicates and test data
+        columns:
+          - name: customer_id
+            description: Unique customer identifier
+            data_type: STRING
+          - name: customer_type
+            description: Type of customer (individual, business, samet=test)
+            data_type: STRING
+          - name: email
+            description: Customer email address
+            data_type: STRING
+          - name: phone_number
+            description: Customer phone number
+            data_type: STRING
+          - name: kyc_status
+            description: Know Your Customer verification status (ok, done, yes, pending, rejected)
+            data_type: STRING
+          - name: address
+            description: Customer address
+            data_type: STRING
+          - name: risk_profile
+            description: Risk profile classification
+            data_type: STRING
+          - name: created_at
+            description: Record creation timestamp
+            data_type: TIMESTAMP
+          - name: updated_at
+            description: Record last update timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted by Airbyte
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker (null if not deleted)
+            data_type: STRING
+
+      - name: payment_methods
+        description: Raw payment method records (credit cards, bank accounts, etc.)
+        columns:
+          - name: payment_method_id
+            description: Unique payment method identifier
+            data_type: STRING
+          - name: customer_id
+            description: FK to customer
+            data_type: STRING
+          - name: method_type
+            description: Type of payment method (credit_card, bank_transfer, wallet, etc.)
+            data_type: STRING
+          - name: is_default
+            description: Whether this is the default payment method
+            data_type: BOOLEAN
+          - name: details
+            description: Additional method details (masked)
+            data_type: STRING
+          - name: created_at
+            description: Record creation timestamp
+            data_type: TIMESTAMP
+          - name: updated_at
+            description: Record last update timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted by Airbyte
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: transactions
+        description: Raw transaction records with potential duplicates
+        columns:
+          - name: transaction_id
+            description: Unique transaction identifier
+            data_type: STRING
+          - name: debtor_customer_id
+            description: FK to debtor customer
+            data_type: STRING
+          - name: creditor_customer_id
+            description: FK to creditor customer
+            data_type: STRING
+          - name: payment_method_id
+            description: FK to payment method used
+            data_type: STRING
+          - name: amount
+            description: Transaction amount
+            data_type: NUMERIC
+          - name: currency
+            description: Currency code (USD, EUR, etc.)
+            data_type: STRING
+          - name: status
+            description: Transaction status (pending, completed, failed, etc.)
+            data_type: STRING
+          - name: reference
+            description: Transaction reference number
+            data_type: STRING
+          - name: created_at
+            description: Transaction timestamp
+            data_type: TIMESTAMP
+          - name: updated_at
+            description: Record last update timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: transaction_legs
+        description: |
+          Raw transaction ledger entries (CRITICAL ISSUE: 17K legs per transaction instead of 2)
+          This table requires significant data cleaning to rebuild proper double-entry accounting
+        columns:
+          - name: leg_id
+            description: Unique ledger leg identifier
+            data_type: STRING
+          - name: transaction_id
+            description: FK to transaction
+            data_type: STRING
+          - name: direction
+            description: Ledger direction (DEBIT or CREDIT)
+            data_type: STRING
+          - name: amount
+            description: Leg amount
+            data_type: NUMERIC
+          - name: currency
+            description: Currency code
+            data_type: STRING
+          - name: account
+            description: Account identifier
+            data_type: STRING
+          - name: created_at
+            description: Leg creation timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: refunds
+        description: Raw refund records
+        columns:
+          - name: refund_id
+            description: Unique refund identifier
+            data_type: STRING
+          - name: original_transaction_id
+            description: FK to original transaction being refunded
+            data_type: STRING
+          - name: amount
+            description: Refund amount
+            data_type: NUMERIC
+          - name: currency
+            description: Currency code
+            data_type: STRING
+          - name: reason
+            description: Reason for refund
+            data_type: STRING
+          - name: status
+            description: Refund status
+            data_type: STRING
+          - name: created_at
+            description: Refund creation timestamp
+            data_type: TIMESTAMP
+          - name: updated_at
+            description: Record last update timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: disputes
+        description: Raw dispute records
+        columns:
+          - name: dispute_id
+            description: Unique dispute identifier
+            data_type: STRING
+          - name: transaction_id
+            description: FK to disputed transaction
+            data_type: STRING
+          - name: amount
+            description: Dispute amount
+            data_type: NUMERIC
+          - name: currency
+            description: Currency code
+            data_type: STRING
+          - name: reason
+            description: Reason for dispute (Test Dispute = test data)
+            data_type: STRING
+          - name: status
+            description: Dispute status
+            data_type: STRING
+          - name: created_at
+            description: Dispute creation timestamp
+            data_type: TIMESTAMP
+          - name: updated_at
+            description: Record last update timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: fees
+        description: Raw fee records
+        columns:
+          - name: fee_id
+            description: Unique fee identifier
+            data_type: STRING
+          - name: transaction_id
+            description: FK to transaction
+            data_type: STRING
+          - name: amount
+            description: Fee amount
+            data_type: NUMERIC
+          - name: currency
+            description: Currency code
+            data_type: STRING
+          - name: fee_type
+            description: Type of fee (Test Fee = test data)
+            data_type: STRING
+          - name: created_at
+            description: Fee creation timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: mandates
+        description: Raw mandate records (recurring payment authorizations)
+        columns:
+          - name: mandate_id
+            description: Unique mandate identifier
+            data_type: STRING
+          - name: customer_id
+            description: FK to customer
+            data_type: STRING
+          - name: payment_method_id
+            description: FK to payment method
+            data_type: STRING
+          - name: reference
+            description: Mandate reference
+            data_type: STRING
+          - name: status
+            description: Mandate status
+            data_type: STRING
+          - name: created_at
+            description: Mandate creation timestamp
+            data_type: TIMESTAMP
+          - name: updated_at
+            description: Record last update timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING
+
+      - name: payouts
+        description: Raw payout records
+        columns:
+          - name: payout_id
+            description: Unique payout identifier
+            data_type: STRING
+          - name: recipient_customer_id
+            description: FK to recipient customer
+            data_type: STRING
+          - name: amount
+            description: Payout amount
+            data_type: NUMERIC
+          - name: currency
+            description: Currency code
+            data_type: STRING
+          - name: status
+            description: Payout status
+            data_type: STRING
+          - name: scheduled_at
+            description: When payout is scheduled
+            data_type: TIMESTAMP
+          - name: executed_at
+            description: When payout was executed
+            data_type: TIMESTAMP
+          - name: created_at
+            description: Payout creation timestamp
+            data_type: TIMESTAMP
+          - name: _airbyte_raw_id
+            description: Airbyte raw record ID
+            data_type: STRING
+          - name: _airbyte_extracted_at
+            description: When record was extracted
+            data_type: TIMESTAMP
+          - name: _ab_cdc_deleted_at
+            description: CDC delete marker
+            data_type: STRING

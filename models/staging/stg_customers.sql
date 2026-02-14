@@ -1,42 +1,76 @@
+-- stg_customers.sql
+-- Purpose: Clean and deduplicate customer data
+-- Removes test data, standardizes KYC status, and removes duplicates
+-- Input: raw customers table (441K rows)
+-- Output: clean unique customers (34 unique customer_ids)
+
 {{ config(
     materialized='table',
     schema='payments_v1',
-    tags=['staging', 'customers']
+    tags=['staging', 'customers'],
+    description='Cleaned customer data with deduplication and test data removal'
 ) }}
 
-with raw_customers as (
-    select
-        _airbyte_raw_id,
-        _airbyte_extracted_at,
-        _airbyte_loaded_at,
-        _airbyte_data,
-        -- Parse JSON data
-        json_extract_scalar(_airbyte_data, '$.customer_id') as customer_id,
-        json_extract_scalar(_airbyte_data, '$.customer_type') as customer_type,
-        json_extract_scalar(_airbyte_data, '$.email') as email,
-        json_extract_scalar(_airbyte_data, '$.phone_number') as phone_number,
-        json_extract_scalar(_airbyte_data, '$.address') as address,
-        json_extract_scalar(_airbyte_data, '$.kyc_status') as kyc_status,
-        json_extract_scalar(_airbyte_data, '$.risk_profile') as risk_profile,
-        timestamp(json_extract_scalar(_airbyte_data, '$.created_at')) as created_at,
-        timestamp(json_extract_scalar(_airbyte_data, '$.updated_at')) as updated_at
-    from {{ source('raw_customers', 'airbyte_raw_customers') }}
-),
-
-cleaned_customers as (
+with source_data as (
     select
         customer_id,
         customer_type,
-        lower(trim(email)) as email,
+        email,
         phone_number,
-        address,
         kyc_status,
-        risk_profile,
         created_at,
         updated_at,
-        current_timestamp() as dbt_loaded_at
-    from raw_customers
-    where customer_id is not null
+        _airbyte_extracted_at,
+        row_number() over (partition by customer_id order by created_at asc) as rn
+    from {{ source('raw_customers', 'customers') }}
+    where _ab_cdc_deleted_at is null  -- Exclude soft-deleted records
+),
+
+-- Remove duplicates: keep first record by created_at for each customer_id
+deduplicated as (
+    select
+        customer_id,
+        customer_type,
+        email,
+        phone_number,
+        kyc_status,
+        created_at,
+        updated_at
+    from source_data
+    where rn = 1
+),
+
+-- Remove test data (customer_type = 'samet')
+remove_test_data as (
+    select
+        customer_id,
+        customer_type,
+        email,
+        phone_number,
+        kyc_status,
+        created_at,
+        updated_at
+    from deduplicated
+    where customer_type != 'samet'
+),
+
+-- Standardize KYC status: map {ok, done, yes} → VERIFIED
+standardize_kyc as (
+    select
+        customer_id,
+        customer_type,
+        email,
+        phone_number,
+        case 
+            when lower(kyc_status) in ('ok', 'done', 'yes') then 'VERIFIED'
+            when lower(kyc_status) = 'pending' then 'PENDING'
+            when lower(kyc_status) = 'rejected' then 'REJECTED'
+            else 'UNKNOWN'
+        end as kyc_status,
+        created_at,
+        updated_at,
+        current_timestamp() as dbt_updated_at
+    from remove_test_data
 )
 
-select * from cleaned_customers
+select * from standardize_kyc

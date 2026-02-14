@@ -1,16 +1,16 @@
-# Name your project! Project names should be lowercase and use underscores as separators
-# See documentation: https://docs.getdbt.com/docs/build/projects
+# dbt Project Configuration for Payment Data Warehouse
+# Project: test_midas
+# Purpose: ELT pipeline for data cleaning and star schema modeling
+# Target: BigQuery (prd-dagen project)
 
 name: 'test_midas'
 version: '1.0.0'
 config-version: 2
 
-# This setting configures which "profile" dbt uses for this project.
+# BigQuery profile configuration
 profile: 'test_midas'
 
-# These configurations specify where dbt should look for different types of files.
-# The `source-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
+# Project paths
 model-paths: ["models"]
 analysis-paths: ["analysis"]
 test-paths: ["tests"]
@@ -18,20 +18,131 @@ seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/build/projects
+# Global variables for the project
+vars:
+  # Data quality thresholds
+  max_duplicate_threshold: 0.05  # Alert if more than 5% duplicates
+  
+  # Date range for date dimension (in days)
+  date_spine_days: 730
+  
+  # Schema configuration
+  raw_schema: 'payments_v1'
+  staging_schema: 'payments_v1'
+  marts_schema: 'payments_v1'
+  
+  # Test data identifiers
+  test_customer_type: 'samet'
+  test_dispute_reason: 'Test Dispute'
+  test_fee_type: 'Test Fee'
 
+# Model configurations
 models:
   test_midas:
-    # Config indicated by + and applies to all files under models/
+    # Staging models (data cleaning layer)
     staging:
       materialized: table
-      +schema: payments_v1
-    # Marts/fact tables
-    +materialized: table
-    +schema: payments_v1
+      schema: payments_v1
+      tags: ['staging', 'daily']
+      
+      # Staging models
+      stg_customers:
+        description: "Cleaned customer data with deduplication"
+        materialized: table
+        
+      stg_payment_methods:
+        description: "Cleaned payment methods with type consolidation"
+        materialized: table
+        
+      stg_transactions:
+        description: "Cleaned transactions with validation"
+        materialized: table
+        
+      stg_transaction_legs:
+        description: "CRITICAL: Rebuilt transaction ledger (17K legs → 2 legs/transaction)"
+        materialized: table
+        tags: ['staging', 'critical', 'daily']
+        
+      stg_refunds:
+        description: "Cleaned refunds with FK validation"
+        materialized: table
+        
+      stg_disputes:
+        description: "Cleaned disputes with test data removal"
+        materialized: table
+        
+      stg_fees:
+        description: "Cleaned fees with test data removal"
+        materialized: table
+        
+      stg_mandates:
+        description: "Cleaned mandates with FK validation"
+        materialized: table
+        
+      stg_payouts:
+        description: "Cleaned payouts with FK validation"
+        materialized: table
+
+    # Dimension models (star schema layer)
+    dim_customers:
+      materialized: table
+      schema: payments_v1
+      tags: ['marts', 'dimension', 'daily']
+      description: "Customer dimension with surrogate keys"
+      
+    dim_payment_methods:
+      materialized: table
+      schema: payments_v1
+      tags: ['marts', 'dimension', 'daily']
+      description: "Payment methods dimension with surrogate keys"
+      
+    dim_date:
+      materialized: table
+      schema: payments_v1
+      tags: ['marts', 'dimension', 'static']
+      description: "Date dimension (730 days)"
+
+    # Fact models (star schema layer)
+    fact_transactions:
+      materialized: table
+      schema: payments_v1
+      tags: ['marts', 'fact', 'daily']
+      description: "Transaction fact table with dimensional keys"
+      
+    fact_transaction_details:
+      materialized: table
+      schema: payments_v1
+      tags: ['marts', 'fact', 'daily']
+      description: "Transaction details with aggregated refunds, disputes, fees"
+      
+    fact_payouts:
+      materialized: table
+      schema: payments_v1
+      tags: ['marts', 'fact', 'daily']
+      description: "Payout fact table with dimensional keys"
+
+# Seed configurations (if using CSV seeds)
+seeds:
+  test_midas:
+    schema: payments_v1
+    +full_refresh: true
+
+# Test configurations
+tests:
+  test_midas:
+    # Store test results in a custom schema
+    +store_failures: true
+    +severity: error
+
+# Require dbt 1.0.0 or later
+require-dbt-version: [">=1.0.0"]
+
+# Dispatch to use dbt_utils macros
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['test_midas', 'dbt_utils']

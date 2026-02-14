@@ -1,41 +1,49 @@
+-- dim_customers.sql
+-- Purpose: Customer dimension table for star schema
+-- Creates surrogate keys and enriches customer attributes
+-- Input: stg_customers (cleaned customer data)
+-- Output: customer dimension with SCD Type 1
+
 {{ config(
-    materialized='incremental',
+    materialized='table',
     schema='payments_v1',
-    unique_key='customer_id',
-    on_schema_change='fail',
-    tags=['dimension', 'customers']
+    tags=['marts', 'dimension', 'customers'],
+    description='Customer dimension with surrogate keys and attributes'
 ) }}
 
-with stg_customers as (
-    select * from {{ ref('stg_customers') }}
-),
-
-customer_with_key as (
+with customers as (
     select
-        row_number() over (order by customer_id) as customer_key,
         customer_id,
         customer_type,
         email,
         phone_number,
-        address,
         kyc_status,
-        risk_profile,
+        created_at,
+        updated_at
+    from {{ ref('stg_customers') }}
+),
+
+-- Add surrogate key and derived attributes
+enrich_customers as (
+    select
+        {{ dbt_utils.generate_surrogate_key(['customer_id']) }} as customer_key,
+        customer_id,
+        customer_type,
+        email,
+        phone_number,
+        kyc_status,
+        case 
+            when kyc_status = 'VERIFIED' then true 
+            else false 
+        end as is_kyc_verified,
+        case 
+            when updated_at >= current_timestamp() - interval 90 day then true 
+            else false 
+        end as is_active,
         created_at,
         updated_at,
-        current_timestamp() as effective_date,
-        cast(null as timestamp) as end_date,
-        true as is_current
-    from stg_customers
-
-    {% if execute %}
-        {% if not run_started_at %}
-            -- Initial load
-            where 1=1
-        {% else %}
-            -- Incremental load - only new or changed records
-            where updated_at >= (select max(updated_at) from {{ this }})
-        {% endif %}
-    {% endif %}
+        current_timestamp() as dbt_loaded_at
+    from customers
 )
 
-select * from customer_with_key
+select * from enrich_customers

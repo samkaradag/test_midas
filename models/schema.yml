@@ -1,0 +1,783 @@
+version: 2
+
+models:
+  # ============================================================================
+  # LAYER 1: STAGING MODELS (Data Cleaning)
+  # ============================================================================
+  
+  - name: stg_customers
+    description: |
+      Cleaned customer dimension with deduplication and test data removal.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate customer records (441K → 34 unique)
+      - Removes test data (customer_type = 'samet')
+      - Standardizes KYC status (ok/done/yes → VERIFIED)
+      
+      **Row Count:** 34 unique customers
+    columns:
+      - name: customer_id
+        description: Unique customer identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: customer_type
+        description: Type of customer (individual, business)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['individual', 'business']
+      - name: email
+        description: Customer email address
+      - name: phone_number
+        description: Customer phone number
+      - name: kyc_status
+        description: KYC verification status (standardized)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['VERIFIED', 'PENDING', 'REJECTED', 'UNKNOWN']
+      - name: created_at
+        description: Record creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_payment_methods
+    description: |
+      Cleaned payment methods with type consolidation.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate payment method records
+      - Consolidates payment types (credit_card → card)
+      - Validates customer foreign key
+      
+      **Row Count:** 21 unique payment methods
+    columns:
+      - name: payment_method_id
+        description: Unique payment method identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: FK to customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: method_type
+        description: Payment method type (standardized)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['card', 'bank_transfer', 'wallet', 'check']
+      - name: is_default
+        description: Whether this is the default payment method
+        tests:
+          - not_null
+      - name: created_at
+        description: Record creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_transactions
+    description: |
+      Cleaned transactions with validation.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate transaction records
+      - Validates transaction status values
+      - Ensures debtor_customer_id ≠ creditor_customer_id
+      - Validates both customer foreign keys
+      - Validates amount > 0
+      
+      **Row Count:** 21 valid transactions
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: debtor_customer_id
+        description: FK to debtor (payer) customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: creditor_customer_id
+        description: FK to creditor (payee) customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: payment_method_id
+        description: FK to payment method used
+      - name: amount
+        description: Transaction amount (must be positive)
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: numeric
+      - name: currency
+        description: Currency code (ISO 4217)
+        tests:
+          - not_null
+      - name: status
+        description: Transaction status (standardized)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED', 'REFUNDED', 'UNKNOWN']
+      - name: reference
+        description: Transaction reference number
+      - name: created_at
+        description: Transaction timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_transaction_legs
+    description: |
+      CRITICAL MODEL: Rebuilt transaction ledger structure.
+      
+      **Data Quality Issues Fixed:**
+      - CRITICAL: Collapses 17,108 legs per transaction → exactly 2 legs per transaction
+      - Aggregates amounts by direction (SUM)
+      - Creates exactly 2 rows per transaction (1 DEBIT, 1 CREDIT)
+      - Validates double-entry accounting (debit amount = credit amount)
+      - Removes invalid directions
+      
+      **Important:** This model rebuilds the entire ledger structure.
+      Original data had 17,963 legs per transaction (broken).
+      Cleaned data has exactly 2 legs per transaction (correct).
+      
+      **Row Count:** ~42 rows (21 transactions × 2 legs)
+    columns:
+      - name: transaction_id
+        description: FK to transaction
+        tests:
+          - not_null
+      - name: direction
+        description: Ledger direction (DEBIT or CREDIT)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['DEBIT', 'CREDIT']
+      - name: amount
+        description: Aggregated leg amount
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: numeric
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: account
+        description: Account identifier
+      - name: created_at
+        description: Leg creation timestamp
+        tests:
+          - not_null
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+      - name: total_debit
+        description: Total debit amount for this transaction
+      - name: total_credit
+        description: Total credit amount for this transaction
+      - name: is_balanced
+        description: Flag indicating if debit = credit (should always be true)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true]
+
+  - name: stg_refunds
+    description: |
+      Cleaned refunds with foreign key validation.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate refund records
+      - Validates original_transaction_id foreign key
+      - Validates amount > 0
+      
+      **Row Count:** 12 valid refunds
+    columns:
+      - name: refund_id
+        description: Unique refund identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: original_transaction_id
+        description: FK to original transaction
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+      - name: amount
+        description: Refund amount
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: reason
+        description: Reason for refund
+      - name: status
+        description: Refund status
+        tests:
+          - accepted_values:
+              values: ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED', 'UNKNOWN']
+      - name: created_at
+        description: Refund creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_disputes
+    description: |
+      Cleaned disputes with test data removal.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate dispute records
+      - Removes test data (reason = 'Test Dispute')
+      - Validates transaction_id foreign key
+      
+      **Row Count:** 12 valid disputes
+    columns:
+      - name: dispute_id
+        description: Unique dispute identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: transaction_id
+        description: FK to disputed transaction
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+      - name: amount
+        description: Dispute amount
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: reason
+        description: Reason for dispute (test data removed)
+      - name: status
+        description: Dispute status
+        tests:
+          - accepted_values:
+              values: ['OPEN', 'RESOLVED', 'LOST', 'UNKNOWN']
+      - name: created_at
+        description: Dispute creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_fees
+    description: |
+      Cleaned fees with test data removal.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate fee records
+      - Removes test data (fee_type = 'Test Fee')
+      - Validates transaction_id foreign key
+      
+      **Row Count:** 21 valid fees
+    columns:
+      - name: fee_id
+        description: Unique fee identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: transaction_id
+        description: FK to transaction
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+      - name: amount
+        description: Fee amount
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: fee_type
+        description: Type of fee (standardized)
+        tests:
+          - accepted_values:
+              values: ['TRANSACTION_FEE', 'SERVICE_FEE', 'PROCESSING_FEE', 'MONTHLY_FEE', 'PENALTY_FEE']
+      - name: created_at
+        description: Fee creation timestamp
+        tests:
+          - not_null
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_mandates
+    description: |
+      Cleaned mandates with foreign key validation.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate mandate records
+      - Validates customer_id foreign key
+      
+      **Row Count:** 21 valid mandates
+    columns:
+      - name: mandate_id
+        description: Unique mandate identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: FK to customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: payment_method_id
+        description: FK to payment method
+      - name: reference
+        description: Mandate reference
+      - name: status
+        description: Mandate status
+        tests:
+          - accepted_values:
+              values: ['ACTIVE', 'INACTIVE', 'EXPIRED', 'PENDING', 'UNKNOWN']
+      - name: created_at
+        description: Mandate creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  - name: stg_payouts
+    description: |
+      Cleaned payouts with foreign key validation.
+      
+      **Data Quality Issues Fixed:**
+      - Removes duplicate payout records
+      - Validates recipient_customer_id foreign key
+      
+      **Row Count:** 21 valid payouts
+    columns:
+      - name: payout_id
+        description: Unique payout identifier (natural key)
+        tests:
+          - not_null
+          - unique
+      - name: recipient_customer_id
+        description: FK to recipient customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: amount
+        description: Payout amount
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: status
+        description: Payout status
+        tests:
+          - accepted_values:
+              values: ['SCHEDULED', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED', 'UNKNOWN']
+      - name: scheduled_at
+        description: When payout is scheduled
+      - name: executed_at
+        description: When payout was executed
+      - name: created_at
+        description: Payout creation timestamp
+        tests:
+          - not_null
+      - name: dbt_updated_at
+        description: When this record was processed by dbt
+
+  # ============================================================================
+  # LAYER 2: DIMENSION MODELS (Star Schema)
+  # ============================================================================
+
+  - name: dim_customers
+    description: |
+      Customer dimension table with surrogate keys.
+      Provides a single view of customer attributes for fact tables.
+      
+      **Attributes:**
+      - Surrogate key for efficient joins
+      - Natural key (customer_id) for traceability
+      - KYC verification status
+      - Activity flag (updated in last 90 days)
+      
+      **Row Count:** 34 customers
+    columns:
+      - name: customer_key
+        description: Surrogate key (hashed customer_id)
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Natural key - unique customer identifier
+        tests:
+          - not_null
+          - unique
+      - name: customer_type
+        description: Type of customer
+        tests:
+          - not_null
+      - name: email
+        description: Customer email address
+      - name: phone_number
+        description: Customer phone number
+      - name: kyc_status
+        description: KYC verification status
+        tests:
+          - not_null
+      - name: is_kyc_verified
+        description: Flag indicating if KYC is verified
+        tests:
+          - not_null
+      - name: is_active
+        description: Flag indicating if customer was active in last 90 days
+        tests:
+          - not_null
+      - name: created_at
+        description: Customer creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Customer last update timestamp
+      - name: dbt_loaded_at
+        description: When this dimension was loaded
+
+  - name: dim_payment_methods
+    description: |
+      Payment methods dimension table with surrogate keys.
+      Links to customer dimension via customer_key.
+      
+      **Row Count:** 21 payment methods
+    columns:
+      - name: payment_method_key
+        description: Surrogate key (hashed payment_method_id)
+        tests:
+          - not_null
+          - unique
+      - name: payment_method_id
+        description: Natural key - unique payment method identifier
+        tests:
+          - not_null
+          - unique
+      - name: customer_key
+        description: FK to dim_customers
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: customer_id
+        description: Denormalized customer_id for reference
+      - name: method_type
+        description: Payment method type
+        tests:
+          - not_null
+      - name: is_default
+        description: Whether this is the default payment method
+        tests:
+          - not_null
+      - name: created_at
+        description: Record creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+      - name: dbt_loaded_at
+        description: When this dimension was loaded
+
+  - name: dim_date
+    description: |
+      Date dimension table for time-based analysis.
+      Covers all dates in the transaction data (730 days).
+      
+      **Attributes:**
+      - Date key (YYYYMMDD format for easy joining)
+      - Calendar date
+      - Year, month, day, quarter, week
+      - Day of week and weekend flag
+      - Day and month names
+      - Year-month for grouping
+      
+      **Row Count:** 730 dates
+    columns:
+      - name: date_key
+        description: Date key in YYYYMMDD format (primary key)
+        tests:
+          - not_null
+          - unique
+      - name: calendar_date
+        description: Actual calendar date
+        tests:
+          - not_null
+          - unique
+      - name: year
+        description: Year (YYYY)
+        tests:
+          - not_null
+      - name: month
+        description: Month (1-12)
+        tests:
+          - not_null
+      - name: day
+        description: Day of month (1-31)
+        tests:
+          - not_null
+      - name: quarter
+        description: Quarter (1-4)
+        tests:
+          - not_null
+      - name: week
+        description: Week number (1-53)
+        tests:
+          - not_null
+      - name: day_of_week
+        description: Day of week (1=Sunday, 7=Saturday)
+        tests:
+          - not_null
+      - name: is_weekend
+        description: Flag indicating if weekend (Saturday or Sunday)
+        tests:
+          - not_null
+      - name: day_name
+        description: Day name (Monday, Tuesday, etc.)
+        tests:
+          - not_null
+      - name: month_name
+        description: Month name (January, February, etc.)
+        tests:
+          - not_null
+      - name: year_month
+        description: Year-month (YYYY-MM) for grouping
+        tests:
+          - not_null
+      - name: dbt_loaded_at
+        description: When this dimension was loaded
+
+  # ============================================================================
+  # LAYER 3: FACT MODELS (Star Schema)
+  # ============================================================================
+
+  - name: fact_transactions
+    description: |
+      Core transaction fact table with dimensional keys.
+      Links transactions to customer, payment method, and date dimensions.
+      
+      **Attributes:**
+      - Transaction surrogate key
+      - Transaction natural key (transaction_id)
+      - FKs to dimensions (date, debtor customer, creditor customer, payment method)
+      - Transaction amount, currency, status
+      - Timestamps
+      
+      **Row Count:** 21 transactions
+      **Grain:** One row per transaction
+    columns:
+      - name: transaction_key
+        description: Surrogate key (hashed transaction_id)
+        tests:
+          - not_null
+          - unique
+      - name: transaction_id
+        description: Natural key - unique transaction identifier
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: FK to dim_date (transaction date)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: debtor_customer_key
+        description: FK to dim_customers (payer)
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: creditor_customer_key
+        description: FK to dim_customers (payee)
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: payment_method_key
+        description: FK to dim_payment_methods
+        tests:
+          - relationships:
+              to: ref('dim_payment_methods')
+              field: payment_method_key
+      - name: transaction_amount
+        description: Transaction amount
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: transaction_status
+        description: Transaction status
+        tests:
+          - not_null
+      - name: reference
+        description: Transaction reference number
+      - name: created_at
+        description: Transaction creation timestamp
+        tests:
+          - not_null
+      - name: updated_at
+        description: Transaction last update timestamp
+      - name: dbt_loaded_at
+        description: When this fact was loaded
+
+  - name: fact_transaction_details
+    description: |
+      Transaction details fact table with aggregated refunds, disputes, and fees.
+      Provides a single view of all transaction-related charges and adjustments.
+      
+      **Attributes:**
+      - FK to fact_transactions
+      - Aggregated refund amount and count
+      - Aggregated dispute amount and count
+      - Aggregated fee amount and count
+      - Net transaction amount (amount - refunds - fees)
+      
+      **Row Count:** 21 transactions (one-to-one with fact_transactions)
+      **Grain:** One row per transaction with aggregated details
+    columns:
+      - name: transaction_key
+        description: FK to fact_transactions
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('fact_transactions')
+              field: transaction_key
+      - name: transaction_id
+        description: Transaction identifier (for reference)
+        tests:
+          - not_null
+      - name: transaction_amount
+        description: Original transaction amount
+        tests:
+          - not_null
+      - name: refund_amount
+        description: Total refund amount for this transaction
+      - name: dispute_amount
+        description: Total dispute amount for this transaction
+      - name: fee_amount
+        description: Total fee amount for this transaction
+      - name: refund_count
+        description: Number of refunds
+      - name: dispute_count
+        description: Number of disputes
+      - name: fee_count
+        description: Number of fees
+      - name: net_transaction_amount
+        description: Net amount (amount - refunds - fees)
+        tests:
+          - not_null
+      - name: dbt_loaded_at
+        description: When this fact was loaded
+
+  - name: fact_payouts
+    description: |
+      Payout fact table with dimensional keys.
+      Links payouts to customer and date dimensions.
+      
+      **Attributes:**
+      - Payout surrogate key
+      - Payout natural key (payout_id)
+      - FKs to dimensions (date, recipient customer)
+      - Payout amount, currency, status
+      - Scheduled and executed timestamps
+      
+      **Row Count:** 21 payouts
+      **Grain:** One row per payout
+    columns:
+      - name: payout_key
+        description: Surrogate key (hashed payout_id)
+        tests:
+          - not_null
+          - unique
+      - name: payout_id
+        description: Natural key - unique payout identifier
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: FK to dim_date (payout creation date)
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: recipient_customer_key
+        description: FK to dim_customers (payout recipient)
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: payout_amount
+        description: Payout amount
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        tests:
+          - not_null
+      - name: payout_status
+        description: Payout status
+        tests:
+          - not_null
+      - name: scheduled_at
+        description: When payout is scheduled
+      - name: executed_at
+        description: When payout was executed
+      - name: created_at
+        description: Payout creation timestamp
+        tests:
+          - not_null
+      - name: dbt_loaded_at
+        description: When this fact was loaded
