@@ -76,4 +76,3 @@ combine_details as (
 )
 
 select * from combine_details
-order by transaction_id

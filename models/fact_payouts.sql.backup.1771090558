@@ -27,7 +27,7 @@ with payouts as (
 -- Join with dimensions
 enrich_payouts as (
     select
-        md5(payout_id) as payout_key,
+        {{ dbt_utils.generate_surrogate_key(['payout_id']) }} as payout_key,
         p.payout_id,
         format_date('%Y%m%d', date(p.created_at)) as date_key,
         dc.customer_key as recipient_customer_key,

@@ -1,0 +1,59 @@
+-- dim_date.sql
+-- Purpose: Date dimension table for star schema
+-- Creates a date spine with all relevant date attributes
+-- Uses a simple approach to generate dates
+
+{{ config(
+    materialized='table',
+    schema='payments_v1',
+    tags=['marts', 'dimension', 'date'],
+    description='Date dimension with comprehensive date attributes'
+) }}
+
+-- Simple date spine from 2024-01-01 to 2025-12-31
+with date_spine as (
+    select
+        date_add('2024-01-01', interval cast(row_number() over (order by 1) - 1 as int64) day) as calendar_date
+    from (
+        select 1 as n union all select 2 union all select 3 union all select 4 union all select 5 union all
+        select 6 union all select 7 union all select 8 union all select 9 union all select 10 union all
+        select 11 union all select 12 union all select 13 union all select 14 union all select 15 union all
+        select 16 union all select 17 union all select 18 union all select 19 union all select 20 union all
+        select 21 union all select 22 union all select 23 union all select 24 union all select 25 union all
+        select 26 union all select 27 union all select 28 union all select 29 union all select 30 union all
+        select 31 union all select 32 union all select 33 union all select 34 union all select 35 union all
+        select 36 union all select 37 union all select 38 union all select 39 union all select 40
+    ) x
+    cross join (
+        select 1 as n union all select 2 union all select 3 union all select 4 union all select 5 union all
+        select 6 union all select 7 union all select 8 union all select 9 union all select 10 union all
+        select 11 union all select 12 union all select 13 union all select 14 union all select 15 union all
+        select 16 union all select 17 union all select 18 union all select 19
+    ) y
+    where date_add('2024-01-01', interval cast(row_number() over (order by 1) - 1 as int64) day) <= '2025-12-31'
+),
+
+-- Enrich with date attributes
+enrich_dates as (
+    select
+        format_date('%Y%m%d', calendar_date) as date_key,
+        calendar_date as calendar_date,
+        extract(year from calendar_date) as year,
+        extract(month from calendar_date) as month,
+        extract(day from calendar_date) as day,
+        extract(quarter from calendar_date) as quarter,
+        extract(week from calendar_date) as week,
+        extract(dayofweek from calendar_date) as day_of_week,
+        case 
+            when extract(dayofweek from calendar_date) in (1, 7) then true 
+            else false 
+        end as is_weekend,
+        format_date('%A', calendar_date) as day_name,
+        format_date('%B', calendar_date) as month_name,
+        format_date('%Y-%m', calendar_date) as year_month,
+        current_timestamp() as dbt_loaded_at
+    from date_spine
+)
+
+select * from enrich_dates
+order by calendar_date

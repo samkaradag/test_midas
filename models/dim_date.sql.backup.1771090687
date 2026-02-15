@@ -1,6 +1,9 @@
 -- dim_date.sql
 -- Purpose: Date dimension table for star schema
 -- Creates a date spine with all relevant date attributes
+-- Covers 730 days from min to max date in transaction data
+-- Input: stg_transactions (to determine date range)
+-- Output: complete date dimension
 
 {{ config(
     materialized='table',
@@ -9,11 +12,37 @@
     description='Date dimension with comprehensive date attributes'
 ) }}
 
--- Generate dates using UNNEST and date arithmetic
-with date_spine as (
+-- Get the date range from transactions
+with date_range as (
     select
-        date_add(date('2024-01-01'), interval offset day) as calendar_date
-    from unnest(generate_array(0, 730)) as offset
+        min(date(created_at)) as min_date,
+        max(date(created_at)) as max_date
+    from {{ ref('stg_transactions') }}
+),
+
+-- Generate date spine for all days in range using a numbers table approach
+date_spine as (
+    with numbers as (
+        select 0 as n union all
+        select 1 union all select 2 union all select 3 union all select 4 union all
+        select 5 union all select 6 union all select 7 union all select 8 union all select 9
+    ),
+    numbers_10 as (
+        select n1.n * 10 + n2.n as n
+        from numbers n1, numbers n2
+    ),
+    numbers_100 as (
+        select n1.n * 100 + n2.n as n
+        from numbers_10 n1, numbers_10 n2
+    ),
+    numbers_1000 as (
+        select n1.n * 1000 + n2.n as n
+        from numbers_100 n1, numbers_10 n2
+    )
+    select
+        date_add((select min_date from date_range), interval n day) as calendar_date
+    from numbers_1000
+    where date_add((select min_date from date_range), interval n day) <= (select max_date from date_range)
 ),
 
 -- Enrich with date attributes

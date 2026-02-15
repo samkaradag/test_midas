@@ -26,7 +26,7 @@ with customers as (
 -- Add surrogate key and derived attributes
 enrich_customers as (
     select
-        md5(customer_id) as customer_key,
+        {{ dbt_utils.generate_surrogate_key(['customer_id']) }} as customer_key,
         customer_id,
         customer_type,
         email,

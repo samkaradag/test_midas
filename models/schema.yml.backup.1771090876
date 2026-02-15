@@ -126,6 +126,8 @@ models:
         description: Transaction amount (must be positive)
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: numeric
       - name: currency
         description: Currency code (ISO 4217)
         tests:
@@ -178,6 +180,8 @@ models:
         description: Aggregated leg amount
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: numeric
       - name: currency
         description: Currency code
         tests:

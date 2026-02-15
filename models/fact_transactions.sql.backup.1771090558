@@ -29,7 +29,7 @@ with transactions as (
 -- Join with dimensions
 enrich_transactions as (
     select
-        md5(transaction_id) as transaction_key,
+        {{ dbt_utils.generate_surrogate_key(['transaction_id']) }} as transaction_key,
         t.transaction_id,
         format_date('%Y%m%d', date(t.created_at)) as date_key,
         dc_debtor.customer_key as debtor_customer_key,

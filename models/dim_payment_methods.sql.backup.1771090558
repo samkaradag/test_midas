@@ -25,7 +25,7 @@ with payment_methods as (
 -- Join with customer dimension to get customer_key
 enrich_payment_methods as (
     select
-        md5(payment_method_id) as payment_method_key,
+        {{ dbt_utils.generate_surrogate_key(['payment_method_id']) }} as payment_method_key,
         payment_method_id,
         dc.customer_key,
         pm.customer_id,
