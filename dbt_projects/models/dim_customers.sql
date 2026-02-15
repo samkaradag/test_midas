@@ -1,4 +1,4 @@
--- dim_customers.sql
+-- dim_customers.sql samet tesrt
 -- Purpose: Customer dimension table for star schema
 -- Creates surrogate keys and enriches customer attributes
 -- Input: stg_customers (cleaned customer data)
