@@ -1,4 +1,4 @@
--- dim_date.sql
+-- dim_date.sqldsaf`
 -- Purpose: Date dimension table for star schema
 -- Creates a date spine with all relevant date attributes
 
