@@ -1,0 +1,668 @@
+version: 2
+
+models:
+  # ============================================================================
+  # STAGING LAYER - Data Cleaning and Deduplication
+  # ============================================================================
+
+  - name: stg_customers
+    description: >
+      Cleaned customer dimension. Deduplicates raw customer records, removes test data
+      (customer_type='samet'), and standardizes KYC status values.
+      Input: 441,409 rows → Output: ~34 rows
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: customer_type
+        description: Type of customer (individual, business, etc.)
+        data_type: STRING
+      - name: email
+        description: Customer email address
+        data_type: STRING
+      - name: phone_number
+        description: Customer phone number
+        data_type: STRING
+      - name: kyc_status
+        description: >
+          KYC verification status (standardized to VERIFIED, UNKNOWN, or other values).
+          Maps {ok, done, yes} → VERIFIED
+        data_type: STRING
+        tests:
+          - accepted_values:
+              values: ['VERIFIED', 'UNKNOWN', 'PENDING', 'REJECTED']
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_payment_methods
+    description: >
+      Cleaned payment methods. Deduplicates raw records and consolidates payment method types.
+      Maps credit_card → card for consistency.
+      Input: 359,247 rows → Output: ~21 rows
+    columns:
+      - name: payment_method_id
+        description: Unique payment method identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Customer who owns this payment method
+        data_type: STRING
+        tests:
+          - not_null
+      - name: method_type
+        description: >
+          Type of payment method (card, bank_account, digital_wallet, etc.).
+          Consolidates credit_card → card
+        data_type: STRING
+      - name: is_default
+        description: Whether this is the customer's default payment method
+        data_type: BOOLEAN
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_transactions
+    description: >
+      Cleaned transactions. Deduplicates raw records, validates status values,
+      and ensures debtor and creditor are different entities.
+      Input: 359,262 rows → Output: ~21 rows
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: debtor_customer_id
+        description: Customer ID of the payer
+        data_type: STRING
+        tests:
+          - not_null
+      - name: creditor_customer_id
+        description: Customer ID of the payee
+        data_type: STRING
+        tests:
+          - not_null
+      - name: payment_method_id
+        description: Payment method used for this transaction
+        data_type: STRING
+      - name: amount
+        description: Transaction amount (must be positive)
+        data_type: NUMERIC
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: numeric
+      - name: currency
+        description: Currency code (e.g., USD, EUR)
+        data_type: STRING
+      - name: status
+        description: Transaction status
+        data_type: STRING
+        tests:
+          - accepted_values:
+              values: ['pending', 'completed', 'failed', 'cancelled']
+      - name: reference
+        description: Transaction reference number
+        data_type: STRING
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_transaction_legs
+    description: >
+      CRITICAL: Rebuilt transaction ledger structure. Fixes broken state where each transaction
+      had 17,108 ledger entries instead of the correct 2 entries (1 debit, 1 credit).
+      
+      Strategy: Groups by transaction_id and direction, aggregates amounts, and validates
+      double-entry accounting (sum of debits = sum of credits).
+      
+      Input: 359,268 rows (17,108 per transaction) → Output: ~42 rows (2 per transaction)
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier
+        data_type: STRING
+        tests:
+          - not_null
+      - name: direction
+        description: Ledger entry direction (debit or credit)
+        data_type: STRING
+        tests:
+          - accepted_values:
+              values: ['debit', 'credit']
+      - name: amount
+        description: Aggregated amount for this ledger entry
+        data_type: NUMERIC
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: account
+        description: Account identifier for this ledger entry
+        data_type: STRING
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_refunds
+    description: >
+      Cleaned refunds. Deduplicates raw records, validates foreign keys to transactions,
+      and removes invalid records.
+      Input: 205,308 rows → Output: ~12 rows
+    columns:
+      - name: refund_id
+        description: Unique refund identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: original_transaction_id
+        description: Transaction being refunded
+        data_type: STRING
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+      - name: amount
+        description: Refund amount
+        data_type: NUMERIC
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: reason
+        description: Reason for refund
+        data_type: STRING
+      - name: status
+        description: Refund status
+        data_type: STRING
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_disputes
+    description: >
+      Cleaned disputes. Deduplicates raw records, removes test disputes (reason='Test Dispute'),
+      validates foreign keys to transactions.
+      Input: 205,318 rows → Output: ~12 rows
+    columns:
+      - name: dispute_id
+        description: Unique dispute identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: transaction_id
+        description: Transaction being disputed
+        data_type: STRING
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+      - name: amount
+        description: Dispute amount
+        data_type: NUMERIC
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: reason
+        description: Reason for dispute
+        data_type: STRING
+      - name: status
+        description: Dispute status
+        data_type: STRING
+        tests:
+          - accepted_values:
+              values: ['open', 'resolved', 'lost', 'won']
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_fees
+    description: >
+      Cleaned fees. Deduplicates raw records, removes test fees (fee_type='Test Fee'),
+      validates foreign keys to transactions.
+      Input: 359,289 rows → Output: ~21 rows
+    columns:
+      - name: fee_id
+        description: Unique fee identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: transaction_id
+        description: Transaction this fee is associated with
+        data_type: STRING
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+      - name: amount
+        description: Fee amount
+        data_type: NUMERIC
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: fee_type
+        description: Type of fee
+        data_type: STRING
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_mandates
+    description: >
+      Cleaned mandates. Deduplicates raw records, validates customer foreign keys.
+      Input: 342,180 rows → Output: ~20 rows
+    columns:
+      - name: mandate_id
+        description: Unique mandate identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Customer this mandate belongs to
+        data_type: STRING
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: payment_method_id
+        description: Payment method for this mandate
+        data_type: STRING
+      - name: reference
+        description: Mandate reference
+        data_type: STRING
+      - name: status
+        description: Mandate status
+        data_type: STRING
+        tests:
+          - accepted_values:
+              values: ['active', 'inactive', 'cancelled']
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+
+  - name: stg_payouts
+    description: >
+      Cleaned payouts. Deduplicates raw records, validates recipient customer foreign keys.
+      Input: 359,301 rows → Output: ~21 rows
+    columns:
+      - name: payout_id
+        description: Unique payout identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: recipient_customer_id
+        description: Customer receiving the payout
+        data_type: STRING
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: amount
+        description: Payout amount
+        data_type: NUMERIC
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: status
+        description: Payout status
+        data_type: STRING
+        tests:
+          - accepted_values:
+              values: ['pending', 'completed', 'failed', 'cancelled']
+      - name: scheduled_at
+        description: When the payout was scheduled
+        data_type: TIMESTAMP
+      - name: executed_at
+        description: When the payout was executed
+        data_type: TIMESTAMP
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+
+  # ============================================================================
+  # DIMENSION LAYER - Star Schema
+  # ============================================================================
+
+  - name: dim_customers
+    description: >
+      Customer dimension table for the star schema. Contains customer attributes
+      with surrogate key (customer_key) and natural key (customer_id).
+      Output: ~34 rows
+    columns:
+      - name: customer_key
+        description: Surrogate key (MD5 hash of customer_id)
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Natural key - unique customer identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: customer_type
+        description: Type of customer
+        data_type: STRING
+      - name: email
+        description: Customer email address
+        data_type: STRING
+      - name: phone_number
+        description: Customer phone number
+        data_type: STRING
+      - name: kyc_status
+        description: KYC verification status
+        data_type: STRING
+      - name: is_active
+        description: Whether the customer is active (kyc_status = VERIFIED)
+        data_type: BOOLEAN
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+      - name: dbt_loaded_at
+        description: When this record was loaded by dbt
+        data_type: TIMESTAMP
+
+  - name: dim_payment_methods
+    description: >
+      Payment methods dimension table. Links to dim_customers via customer_key.
+      Output: ~21 rows
+    columns:
+      - name: payment_method_key
+        description: Surrogate key (MD5 hash of payment_method_id)
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: payment_method_id
+        description: Natural key - unique payment method identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: customer_key
+        description: Foreign key to dim_customers
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: method_type
+        description: Type of payment method
+        data_type: STRING
+      - name: is_default
+        description: Whether this is the customer's default payment method
+        data_type: BOOLEAN
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+      - name: dbt_loaded_at
+        description: When this record was loaded by dbt
+        data_type: TIMESTAMP
+
+  - name: dim_date
+    description: >
+      Date dimension table covering the entire transaction period (2025-07-26 to 2025-09-08).
+      Provides date attributes for time-based analysis.
+      Output: 44 rows
+    columns:
+      - name: date_key
+        description: Date key in YYYYMMDD format
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: date
+        description: Calendar date
+        data_type: DATE
+        tests:
+          - not_null
+      - name: year
+        description: Year
+        data_type: INTEGER
+      - name: month
+        description: Month (1-12)
+        data_type: INTEGER
+      - name: day
+        description: Day of month (1-31)
+        data_type: INTEGER
+      - name: quarter
+        description: Quarter (1-4)
+        data_type: INTEGER
+      - name: week_of_year
+        description: Week of year (1-53)
+        data_type: INTEGER
+      - name: day_of_week
+        description: Day of week (1=Sunday, 7=Saturday)
+        data_type: INTEGER
+      - name: is_weekend
+        description: Whether the date is a weekend
+        data_type: BOOLEAN
+      - name: day_name
+        description: Day name (Monday, Tuesday, etc.)
+        data_type: STRING
+      - name: month_name
+        description: Month name (January, February, etc.)
+        data_type: STRING
+      - name: dbt_loaded_at
+        description: When this record was loaded by dbt
+        data_type: TIMESTAMP
+
+  # ============================================================================
+  # FACT LAYER - Star Schema
+  # ============================================================================
+
+  - name: fact_transactions
+    description: >
+      Transaction fact table for the star schema. Contains transaction details
+      with foreign keys to dim_customers (debtor and creditor), dim_payment_methods,
+      and dim_date.
+      Output: ~21 rows
+    columns:
+      - name: transaction_key
+        description: Surrogate key (MD5 hash of transaction_id)
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: transaction_id
+        description: Natural key - unique transaction identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: Foreign key to dim_date
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: debtor_customer_key
+        description: Foreign key to dim_customers (payer)
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: creditor_customer_key
+        description: Foreign key to dim_customers (payee)
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: payment_method_key
+        description: Foreign key to dim_payment_methods
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_payment_methods')
+              field: payment_method_key
+      - name: transaction_amount
+        description: Transaction amount
+        data_type: NUMERIC
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: transaction_status
+        description: Transaction status
+        data_type: STRING
+      - name: reference
+        description: Transaction reference number
+        data_type: STRING
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: updated_at
+        description: Record last update timestamp
+        data_type: TIMESTAMP
+      - name: dbt_loaded_at
+        description: When this record was loaded by dbt
+        data_type: TIMESTAMP
+
+  - name: fact_transaction_details
+    description: >
+      Transaction details fact table. Aggregates refunds, disputes, and fees
+      by transaction. Links to fact_transactions via transaction_key.
+      Output: ~21 rows (one per transaction)
+    columns:
+      - name: transaction_key
+        description: Foreign key to fact_transactions
+        data_type: STRING
+        tests:
+          - not_null
+          - relationships:
+              to: ref('fact_transactions')
+              field: transaction_key
+      - name: transaction_id
+        description: Transaction identifier
+        data_type: STRING
+      - name: refund_amount
+        description: Total refund amount for this transaction
+        data_type: NUMERIC
+      - name: dispute_amount
+        description: Total dispute amount for this transaction
+        data_type: NUMERIC
+      - name: fee_amount
+        description: Total fee amount for this transaction
+        data_type: NUMERIC
+      - name: refund_count
+        description: Number of refunds for this transaction
+        data_type: INTEGER
+      - name: dispute_count
+        description: Number of disputes for this transaction
+        data_type: INTEGER
+      - name: fee_count
+        description: Number of fees for this transaction
+        data_type: INTEGER
+      - name: net_transaction_amount
+        description: Net amount = transaction_amount - refunds - fees
+        data_type: NUMERIC
+      - name: dbt_loaded_at
+        description: When this record was loaded by dbt
+        data_type: TIMESTAMP
+
+  - name: fact_payouts
+    description: >
+      Payout fact table for the star schema. Contains payout details
+      with foreign keys to dim_customers (recipient) and dim_date.
+      Output: ~21 rows
+    columns:
+      - name: payout_key
+        description: Surrogate key (MD5 hash of payout_id)
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: payout_id
+        description: Natural key - unique payout identifier
+        data_type: STRING
+        tests:
+          - not_null
+          - unique
+      - name: date_key
+        description: Foreign key to dim_date
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: recipient_customer_key
+        description: Foreign key to dim_customers (payout recipient)
+        data_type: STRING
+        tests:
+          - relationships:
+              to: ref('dim_customers')
+              field: customer_key
+      - name: payout_amount
+        description: Payout amount
+        data_type: NUMERIC
+      - name: currency
+        description: Currency code
+        data_type: STRING
+      - name: payout_status
+        description: Payout status
+        data_type: STRING
+      - name: scheduled_at
+        description: When the payout was scheduled
+        data_type: TIMESTAMP
+      - name: executed_at
+        description: When the payout was executed
+        data_type: TIMESTAMP
+      - name: created_at
+        description: Record creation timestamp
+        data_type: TIMESTAMP
+      - name: dbt_loaded_at
+        description: When this record was loaded by dbt
+        data_type: TIMESTAMP

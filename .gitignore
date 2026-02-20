@@ -31,3 +31,9 @@ metastore_db/
 spark-warehouse/
 derby.log
 # === END Dagen security block ===
+# DBT BigQuery credentials - NEVER commit these files
+
+
+# Logs and temporary files
+*.log
+

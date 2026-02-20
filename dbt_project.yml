@@ -1,0 +1,173 @@
+# ============================================================================
+# DBT Project Configuration: test_midas
+# ============================================================================
+# Comprehensive production-ready data cleaning and star schema project
+# for payments data in BigQuery
+#
+# Project Structure:
+# - Staging Layer: 9 models for data cleaning and deduplication
+# - Dimension Layer: 3 models for dimensional tables
+# - Fact Layer: 3 models for fact tables
+# Total: 15 models
+# ============================================================================
+
+name: 'test_midas'
+version: '2.0.0'
+config-version: 2
+
+# Profile configuration - must match profiles.yml
+profile: 'test_midas'
+
+# Model and directory paths
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+# Target and output paths
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+# ============================================================================
+# Model Configuration
+# ============================================================================
+models:
+  test_midas:
+    # Default materialization for all models
+    +materialized: table
+    +schema: payments_v1
+
+    # ========================================================================
+    # STAGING LAYER - Data Cleaning and Deduplication
+    # ========================================================================
+    staging:
+      +materialized: view
+      +schema: payments_v1
+      +tags: ['staging']
+
+      stg_customers:
+        +description: "Cleaned and deduplicated customers (441K → 34 rows)"
+        +tags: ['staging', 'customers', 'critical']
+
+      stg_payment_methods:
+        +description: "Cleaned and deduplicated payment methods (359K → 21 rows)"
+        +tags: ['staging', 'payment_methods']
+
+      stg_transactions:
+        +description: "Cleaned and deduplicated transactions (359K → 21 rows)"
+        +tags: ['staging', 'transactions']
+
+      stg_transaction_legs:
+        +description: "CRITICAL: Rebuilt ledger structure (359K legs → 42 rows, 2 per transaction)"
+        +tags: ['staging', 'transaction_legs', 'critical']
+
+      stg_refunds:
+        +description: "Cleaned and deduplicated refunds (205K → 12 rows)"
+        +tags: ['staging', 'refunds']
+
+      stg_disputes:
+        +description: "Cleaned and deduplicated disputes (205K → 12 rows)"
+        +tags: ['staging', 'disputes']
+
+      stg_fees:
+        +description: "Cleaned and deduplicated fees (359K → 21 rows)"
+        +tags: ['staging', 'fees']
+
+      stg_mandates:
+        +description: "Cleaned and deduplicated mandates (342K → 20 rows)"
+        +tags: ['staging', 'mandates']
+
+      stg_payouts:
+        +description: "Cleaned and deduplicated payouts (359K → 21 rows)"
+        +tags: ['staging', 'payouts']
+
+    # ========================================================================
+    # DIMENSION LAYER - Star Schema
+    # ========================================================================
+    dim_customers:
+      +materialized: table
+      +schema: payments_v1
+      +description: "Customer dimension with surrogate and natural keys (34 rows)"
+      +tags: ['dimension', 'customers']
+
+    dim_payment_methods:
+      +materialized: table
+      +schema: payments_v1
+      +description: "Payment methods dimension (21 rows)"
+      +tags: ['dimension', 'payment_methods']
+
+    dim_date:
+      +materialized: table
+      +schema: payments_v1
+      +description: "Date dimension (2025-07-26 to 2025-09-08, 44 rows)"
+      +tags: ['dimension', 'date']
+
+    # ========================================================================
+    # FACT LAYER - Star Schema
+    # ========================================================================
+    fact_transactions:
+      +materialized: table
+      +schema: payments_v1
+      +description: "Transaction fact table with dimensional foreign keys (21 rows)"
+      +tags: ['fact', 'transactions']
+
+    fact_transaction_details:
+      +materialized: table
+      +schema: payments_v1
+      +description: "Transaction details with aggregated refunds, disputes, fees (21 rows)"
+      +tags: ['fact', 'transaction_details']
+
+    fact_payouts:
+      +materialized: table
+      +schema: payments_v1
+      +description: "Payout fact table with dimensional foreign keys (21 rows)"
+      +tags: ['fact', 'payouts']
+
+# ============================================================================
+# Variable Definitions
+# ============================================================================
+vars:
+  # Data quality thresholds
+  max_null_percent: 0.05
+  min_row_count: 1
+  
+  # Test configuration
+  run_data_quality_tests: true
+  
+  # Environment
+  environment: "production"
+
+# ============================================================================
+# Seeds Configuration
+# ============================================================================
+seeds:
+  test_midas:
+    +schema: payments_v1
+    +tags: ['seed']
+
+# ============================================================================
+# Snapshots Configuration
+# ============================================================================
+snapshots:
+  test_midas:
+    +schema: payments_v1_snapshots
+    +tags: ['snapshot']
+
+# ============================================================================
+# Query Configuration
+# ============================================================================
+quoting:
+  identifier: true
+  schema: false
+
+# ============================================================================
+# Dispatch Configuration
+# ============================================================================
+dispatch:
+  - macro_namespace: dbt_utils
+    search_order: ['test_midas', 'dbt_utils']
