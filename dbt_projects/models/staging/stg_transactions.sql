@@ -15,7 +15,7 @@
 with source_data as (
     select
         transaction_id,
-        debtor_customer_id,
+        debtor_cus_id,
         creditor_customer_id,
         payment_method_id,
         amount,
