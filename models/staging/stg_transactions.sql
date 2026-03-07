@@ -1,16 +1,16 @@
-{{
+{%
   config(
     materialized='view',
     schema='payments_v1',
     tags=['staging', 'transactions'],
     description='Cleaned and deduplicated transactions. Validates transaction integrity.'
   )
-}}
+%}
 
 with source_data as (
   select
     transaction_id,
-    debtor_customer_id,
+    debtor_cus_id as debtor_customer_id,
     creditor_customer_id,
     payment_method_id,
     amount,

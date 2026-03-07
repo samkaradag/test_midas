@@ -77,7 +77,6 @@ models:
     description: >
       Cleaned transactions. Deduplicates raw records, validates status values,
       and ensures debtor and creditor are different entities.
-      FIXED: Maps source column debtor_cus_id → debtor_customer_id for consistency.
       Input: 359,262 rows → Output: ~21 rows
     columns:
       - name: transaction_id
