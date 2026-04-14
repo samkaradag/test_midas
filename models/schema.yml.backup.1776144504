@@ -6,7 +6,10 @@ models:
   # ============================================================================
 
   - name: stg_customers
-    description: >\n      Cleaned customer dimension. Deduplicates raw customer records, removes test data\n      (customer_type='samet'), and standardizes KYC status values.\n      Input: 441,409 rows → Output: ~34 rows
+    description: >
+      Cleaned customer dimension. Deduplicates raw customer records, removes test data
+      (customer_type='samet'), and standardizes KYC status values.
+      Input: 441,409 rows → Output: ~34 rows
     columns:
       - name: customer_id
         description: Unique customer identifier
@@ -24,7 +27,9 @@ models:
         description: Customer phone number
         data_type: STRING
       - name: kyc_status
-        description: >\n          KYC verification status (standardized to VERIFIED, UNKNOWN, or other values).\n          Maps {ok, done, yes} → VERIFIED
+        description: >
+          KYC verification status (standardized to VERIFIED, UNKNOWN, or other values).
+          Maps {ok, done, yes} → VERIFIED
         data_type: STRING
         tests:
           - accepted_values:
@@ -37,7 +42,10 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_payment_methods
-    description: >\n      Cleaned payment methods. Deduplicates raw records and consolidates payment method types.\n      Maps credit_card → card for consistency.\n      Input: 359,247 rows → Output: ~21 rows
+    description: >
+      Cleaned payment methods. Deduplicates raw records and consolidates payment method types.
+      Maps credit_card → card for consistency.
+      Input: 359,247 rows → Output: ~21 rows
     columns:
       - name: payment_method_id
         description: Unique payment method identifier
@@ -51,7 +59,9 @@ models:
         tests:
           - not_null
       - name: method_type
-        description: >\n          Type of payment method (card, bank_account, digital_wallet, etc.).\n          Consolidates credit_card → card
+        description: >
+          Type of payment method (card, bank_account, digital_wallet, etc.).
+          Consolidates credit_card → card
         data_type: STRING
       - name: is_default
         description: Whether this is the customer's default payment method
@@ -64,7 +74,11 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_transactions
-    description: >\n      Cleaned transactions. Deduplicates raw records, validates status values,\n      and ensures debtor and creditor are different entities.\n      FIXED: Maps source column debtor_cus_id → debtor_customer_id for consistency.\n      Input: 359,262 rows → Output: ~21 rows
+    description: >
+      Cleaned transactions. Deduplicates raw records, validates status values,
+      and ensures debtor and creditor are different entities.
+      FIXED: Maps source column debtor_cus_id → debtor_customer_id for consistency.
+      Input: 359,262 rows → Output: ~21 rows
     columns:
       - name: transaction_id
         description: Unique transaction identifier
@@ -114,7 +128,14 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_transaction_legs
-    description: >\n      CRITICAL: Rebuilt transaction ledger structure. Fixes broken state where each transaction\n      had 17,108 ledger entries instead of the correct 2 entries (1 debit, 1 credit).\n      \n      Strategy: Groups by transaction_id and direction, aggregates amounts, and validates\n      double-entry accounting (sum of debits = sum of credits).\n      \n      Input: 359,268 rows (17,108 per transaction) → Output: ~42 rows (2 per transaction)
+    description: >
+      CRITICAL: Rebuilt transaction ledger structure. Fixes broken state where each transaction
+      had 17,108 ledger entries instead of the correct 2 entries (1 debit, 1 credit).
+      
+      Strategy: Groups by transaction_id and direction, aggregates amounts, and validates
+      double-entry accounting (sum of debits = sum of credits).
+      
+      Input: 359,268 rows (17,108 per transaction) → Output: ~42 rows (2 per transaction)
     columns:
       - name: transaction_id
         description: Unique transaction identifier
@@ -143,7 +164,10 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_refunds
-    description: >\n      Cleaned refunds. Deduplicates raw records, validates foreign keys to transactions,\n      and removes invalid records.\n      Input: 205,308 rows → Output: ~12 rows
+    description: >
+      Cleaned refunds. Deduplicates raw records, validates foreign keys to transactions,
+      and removes invalid records.
+      Input: 205,308 rows → Output: ~12 rows
     columns:
       - name: refund_id
         description: Unique refund identifier
@@ -181,7 +205,10 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_disputes
-    description: >\n      Cleaned disputes. Deduplicates raw records, removes test disputes (reason='Test Dispute'),\n      validates foreign keys to transactions.\n      Input: 205,318 rows → Output: ~12 rows
+    description: >
+      Cleaned disputes. Deduplicates raw records, removes test disputes (reason='Test Dispute'),
+      validates foreign keys to transactions.
+      Input: 205,318 rows → Output: ~12 rows
     columns:
       - name: dispute_id
         description: Unique dispute identifier
@@ -222,7 +249,10 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_fees
-    description: >\n      Cleaned fees. Deduplicates raw records, removes test fees (fee_type='Test Fee'),\n      validates foreign keys to transactions.\n      Input: 359,289 rows → Output: ~21 rows
+    description: >
+      Cleaned fees. Deduplicates raw records, removes test fees (fee_type='Test Fee'),
+      validates foreign keys to transactions.
+      Input: 359,289 rows → Output: ~21 rows
     columns:
       - name: fee_id
         description: Unique fee identifier
@@ -254,7 +284,9 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_mandates
-    description: >\n      Cleaned mandates. Deduplicates raw records, validates customer foreign keys.\n      Input: 342,180 rows → Output: ~20 rows
+    description: >
+      Cleaned mandates. Deduplicates raw records, validates customer foreign keys.
+      Input: 342,180 rows → Output: ~20 rows
     columns:
       - name: mandate_id
         description: Unique mandate identifier
@@ -290,7 +322,9 @@ models:
         data_type: TIMESTAMP
 
   - name: stg_payouts
-    description: >\n      Cleaned payouts. Deduplicates raw records, validates recipient customer foreign keys.\n      Input: 359,301 rows → Output: ~21 rows
+    description: >
+      Cleaned payouts. Deduplicates raw records, validates recipient customer foreign keys.
+      Input: 359,301 rows → Output: ~21 rows
     columns:
       - name: payout_id
         description: Unique payout identifier
@@ -331,234 +365,14 @@ models:
         data_type: TIMESTAMP
 
   # ============================================================================
-  # FRAUD ANALYTICS STAGING MODELS
-  # ============================================================================
-
-  - name: stg_transactions_fraud
-    description: >\n      Transactions enriched with fraud indicator from disputes. Joins stg_transactions\n      with stg_disputes to add is_fraud flag (1 if transaction has a dispute, 0 otherwise).\n      Used as the base for fraud analytics and ML feature engineering.
-    columns:
-      - name: transaction_id
-        description: Unique transaction identifier
-        data_type: STRING
-        tests:
-          - not_null
-          - unique
-      - name: debtor_customer_id
-        description: Customer ID of the payer
-        data_type: STRING
-        tests:
-          - not_null
-      - name: creditor_customer_id
-        description: Customer ID of the payee
-        data_type: STRING
-        tests:
-          - not_null
-      - name: payment_method_id
-        description: Payment method used for this transaction
-        data_type: STRING
-      - name: amount
-        description: Transaction amount
-        data_type: NUMERIC
-        tests:
-          - not_null
-      - name: currency
-        description: Currency code
-        data_type: STRING
-      - name: status
-        description: Transaction status
-        data_type: STRING
-      - name: reference
-        description: Transaction reference number
-        data_type: STRING
-      - name: is_fraud
-        description: Fraud indicator (1 if transaction has a dispute, 0 otherwise)
-        data_type: INTEGER
-        tests:
-          - not_null
-          - accepted_values:
-              values: [0, 1]
-      - name: dispute_id
-        description: Associated dispute ID (null if no dispute)
-        data_type: STRING
-      - name: dispute_amount
-        description: Dispute amount (null if no dispute)
-        data_type: NUMERIC
-      - name: dispute_reason
-        description: Reason for dispute (null if no dispute)
-        data_type: STRING
-      - name: dispute_status
-        description: Dispute status (null if no dispute)
-        data_type: STRING
-      - name: created_at
-        description: Transaction creation timestamp
-        data_type: TIMESTAMP
-      - name: updated_at
-        description: Transaction last update timestamp
-        data_type: TIMESTAMP
-
-  - name: stg_customer_transaction_history
-    description: >\n      Customer transaction history aggregates for ML feature engineering.\n      Computes transaction counts, totals, averages, and temporal features per customer.\n      One row per unique customer_id from debtor_customer_id in stg_transactions_fraud.
-    columns:
-      - name: customer_id
-        description: Unique customer identifier
-        data_type: STRING
-        tests:
-          - not_null
-          - unique
-      - name: total_transactions
-        description: Total number of transactions by this customer
-        data_type: INTEGER
-        tests:
-          - not_null
-      - name: fraud_transactions
-        description: Number of fraudulent transactions (with disputes)
-        data_type: INTEGER
-      - name: legitimate_transactions
-        description: Number of legitimate transactions (no disputes)
-        data_type: INTEGER
-      - name: total_amount
-        description: Total transaction amount across all transactions
-        data_type: NUMERIC
-      - name: avg_amount
-        description: Average transaction amount
-        data_type: NUMERIC
-      - name: min_amount
-        description: Minimum transaction amount
-        data_type: NUMERIC
-      - name: max_amount
-        description: Maximum transaction amount
-        data_type: NUMERIC
-      - name: stddev_amount
-        description: Standard deviation of transaction amounts
-        data_type: NUMERIC
-      - name: completed_transactions
-        description: Number of completed transactions
-        data_type: INTEGER
-      - name: failed_transactions
-        description: Number of failed transactions
-        data_type: INTEGER
-      - name: pending_transactions
-        description: Number of pending transactions
-        data_type: INTEGER
-      - name: first_transaction_date
-        description: Date of first transaction
-        data_type: TIMESTAMP
-      - name: last_transaction_date
-        description: Date of most recent transaction
-        data_type: TIMESTAMP
-      - name: days_active
-        description: Number of days between first and last transaction
-        data_type: INTEGER
-      - name: fraud_rate_pct
-        description: Percentage of transactions that are fraudulent (0-100)
-        data_type: NUMERIC
-      - name: dbt_created_at
-        description: When this record was created by dbt
-        data_type: TIMESTAMP
-
-  - name: stg_fraud_features
-    description: >\n      ML-ready fraud features derived from transactions, customer history, and payment methods.\n      Includes behavioral, temporal, and monetary features for fraud detection models.\n      One row per transaction with comprehensive feature set.
-    columns:
-      - name: transaction_id
-        description: Unique transaction identifier
-        data_type: STRING
-        tests:
-          - not_null
-      - name: debtor_customer_id
-        description: Customer ID of the payer
-        data_type: STRING
-        tests:
-          - not_null
-      - name: creditor_customer_id
-        description: Customer ID of the payee
-        data_type: STRING
-        tests:
-          - not_null
-      - name: payment_method_id
-        description: Payment method used
-        data_type: STRING
-      - name: fraud_label
-        description: Target variable for ML (1=fraud, 0=legitimate)
-        data_type: INTEGER
-        tests:
-          - not_null
-          - accepted_values:
-              values: [0, 1]
-      - name: transaction_amount
-        description: Transaction amount in original currency
-        data_type: NUMERIC
-        tests:
-          - not_null
-      - name: currency
-        description: Currency code
-        data_type: STRING
-      - name: transaction_status
-        description: Transaction status
-        data_type: STRING
-      - name: transaction_hour
-        description: Hour of day when transaction occurred (0-23)
-        data_type: INTEGER
-      - name: transaction_day_of_week
-        description: Day of week (1=Sunday, 7=Saturday)
-        data_type: INTEGER
-      - name: transaction_date
-        description: Date of transaction
-        data_type: DATE
-      - name: customer_lifetime_transactions
-        description: Total transactions by this customer
-        data_type: INTEGER
-      - name: customer_fraud_rate_pct
-        description: Historical fraud rate for this customer
-        data_type: NUMERIC
-      - name: customer_avg_transaction_amount
-        description: Customer's average transaction amount
-        data_type: NUMERIC
-      - name: customer_stddev_transaction_amount
-        description: Customer's transaction amount standard deviation
-        data_type: NUMERIC
-      - name: customer_completed_transactions
-        description: Number of completed transactions by customer
-        data_type: INTEGER
-      - name: customer_failed_transactions
-        description: Number of failed transactions by customer
-        data_type: INTEGER
-      - name: customer_days_active
-        description: Days between customer's first and last transaction
-        data_type: INTEGER
-      - name: amount_zscore
-        description: Z-score of transaction amount vs customer average
-        data_type: NUMERIC
-      - name: is_max_amount_exceeded
-        description: Whether transaction exceeds customer's historical max
-        data_type: INTEGER
-      - name: method_type
-        description: Type of payment method (card, bank_account, etc.)
-        data_type: STRING
-      - name: payment_method_is_default
-        description: Whether this is customer's default payment method
-        data_type: BOOLEAN
-      - name: kyc_status
-        description: Customer's KYC verification status
-        data_type: STRING
-      - name: is_kyc_verified
-        description: Whether customer is KYC verified (1=yes, 0=no)
-        data_type: INTEGER
-      - name: customer_risk_segment
-        description: Risk segment based on fraud rate (low_risk, medium_risk, high_risk)
-        data_type: STRING
-        tests:
-          - accepted_values:
-              values: ['low_risk', 'medium_risk', 'high_risk']
-      - name: created_at
-        description: Transaction creation timestamp
-        data_type: TIMESTAMP
-
-  # ============================================================================
   # DIMENSION LAYER - Star Schema
   # ============================================================================
 
   - name: dim_customers
-    description: >\n      Customer dimension table for the star schema. Contains customer attributes\n      with surrogate key (customer_key) and natural key (customer_id).\n      Output: ~34 rows
+    description: >
+      Customer dimension table for the star schema. Contains customer attributes
+      with surrogate key (customer_key) and natural key (customer_id).
+      Output: ~34 rows
     columns:
       - name: customer_key
         description: Surrogate key (MD5 hash of customer_id)
@@ -598,7 +412,9 @@ models:
         data_type: TIMESTAMP
 
   - name: dim_payment_methods
-    description: >\n      Payment methods dimension table. Links to dim_customers via customer_key.\n      Output: ~21 rows
+    description: >
+      Payment methods dimension table. Links to dim_customers via customer_key.
+      Output: ~21 rows
     columns:
       - name: payment_method_key
         description: Surrogate key (MD5 hash of payment_method_id)
@@ -636,7 +452,10 @@ models:
         data_type: TIMESTAMP
 
   - name: dim_date
-    description: >\n      Date dimension table covering the entire transaction period (2025-07-26 to 2025-09-08).\n      Provides date attributes for time-based analysis.\n      Output: 44 rows
+    description: >
+      Date dimension table covering the entire transaction period (2025-07-26 to 2025-09-08).
+      Provides date attributes for time-based analysis.
+      Output: 44 rows
     columns:
       - name: date_key
         description: Date key in YYYYMMDD format
@@ -685,7 +504,11 @@ models:
   # ============================================================================
 
   - name: fact_transactions
-    description: >\n      Transaction fact table for the star schema. Contains transaction details\n      with foreign keys to dim_customers (debtor and creditor), dim_payment_methods,\n      and dim_date.\n      Output: ~21 rows
+    description: >
+      Transaction fact table for the star schema. Contains transaction details
+      with foreign keys to dim_customers (debtor and creditor), dim_payment_methods,
+      and dim_date.
+      Output: ~21 rows
     columns:
       - name: transaction_key
         description: Surrogate key (MD5 hash of transaction_id)
@@ -750,7 +573,10 @@ models:
         data_type: TIMESTAMP
 
   - name: fact_transaction_details
-    description: >\n      Transaction details fact table. Aggregates refunds, disputes, and fees\n      by transaction. Links to fact_transactions via transaction_key.\n      Output: ~21 rows (one per transaction)
+    description: >
+      Transaction details fact table. Aggregates refunds, disputes, and fees
+      by transaction. Links to fact_transactions via transaction_key.
+      Output: ~21 rows (one per transaction)
     columns:
       - name: transaction_key
         description: Foreign key to fact_transactions
@@ -789,7 +615,10 @@ models:
         data_type: TIMESTAMP
 
   - name: fact_payouts
-    description: >\n      Payout fact table for the star schema. Contains payout details\n      with foreign keys to dim_customers (recipient) and dim_date.\n      Output: ~21 rows
+    description: >
+      Payout fact table for the star schema. Contains payout details
+      with foreign keys to dim_customers (recipient) and dim_date.
+      Output: ~21 rows
     columns:
       - name: payout_key
         description: Surrogate key (MD5 hash of payout_id)
