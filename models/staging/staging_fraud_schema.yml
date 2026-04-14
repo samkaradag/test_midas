@@ -1,0 +1,251 @@
+version: 2
+
+models:
+  - name: stg_transactions_enriched
+    description: |
+      Enriched transactions with fraud labels, customer profiles, and payment method details.
+      Joins transactions with disputes (fraud indicator), customer KYC status, and payment method types.
+      Used as the foundation for fraud feature engineering and analysis.
+    columns:
+      - name: transaction_id
+        description: Unique transaction identifier
+        tests:
+          - not_null
+          - unique
+      - name: debtor_customer_id
+        description: Customer ID of the transaction initiator
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: creditor_customer_id
+        description: Customer ID of the transaction recipient
+        tests:
+          - not_null
+      - name: payment_method_id
+        description: Payment method used for the transaction
+        tests:
+          - relationships:
+              to: ref('stg_payment_methods')
+              field: payment_method_id
+      - name: customer_id
+        description: Debtor customer ID (denormalized from debtor_customer_id for convenience)
+      - name: amount
+        description: Transaction amount in base currency
+        tests:
+          - not_null
+      - name: currency
+        description: Currency code (e.g., USD, EUR)
+      - name: transaction_status
+        description: Transaction status (pending, completed, failed, cancelled)
+        tests:
+          - accepted_values:
+              values: ['pending', 'completed', 'failed', 'cancelled']
+      - name: is_fraud
+        description: Fraud indicator (1 if transaction has a dispute, 0 otherwise)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: dispute_id
+        description: Associated dispute ID if transaction is disputed
+      - name: dispute_amount
+        description: Amount disputed
+      - name: dispute_reason
+        description: Reason for dispute (e.g., unauthorized, duplicate)
+      - name: dispute_status
+        description: Dispute status (open, resolved, lost, won)
+      - name: reference
+        description: Transaction reference number
+      - name: customer_type
+        description: Customer type classification
+      - name: kyc_status
+        description: KYC verification status (VERIFIED, PENDING, UNKNOWN, REJECTED)
+        tests:
+          - accepted_values:
+              values: ['VERIFIED', 'PENDING', 'UNKNOWN', 'REJECTED']
+      - name: country
+        description: Customer country of operation
+      - name: method_type
+        description: Payment method type (e.g., card, bank_account, wallet)
+      - name: payment_method_is_default
+        description: Whether this is the customer's default payment method
+      - name: transaction_created_at
+        description: Timestamp when transaction was created
+        tests:
+          - not_null
+      - name: transaction_updated_at
+        description: Timestamp when transaction was last updated
+      - name: dispute_created_at
+        description: Timestamp when dispute was created (null if no dispute)
+      - name: customer_created_at
+        description: Timestamp when customer account was created
+      - name: payment_method_created_at
+        description: Timestamp when payment method was registered
+      - name: dbt_created_at
+        description: Timestamp when this record was created by dbt
+
+  - name: stg_customer_profile
+    description: |
+      Deduplicated and enriched customer profiles with KYC status and risk scoring.
+      Aggregates transaction history and dispute patterns to compute customer risk segments.
+      One row per unique customer. Used for customer-level fraud risk assessment and feature engineering.
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - not_null
+          - unique
+      - name: customer_type
+        description: Customer type classification
+      - name: kyc_status
+        description: KYC verification status (VERIFIED, PENDING, UNKNOWN, REJECTED)
+        tests:
+          - accepted_values:
+              values: ['VERIFIED', 'PENDING', 'UNKNOWN', 'REJECTED']
+      - name: is_kyc_verified
+        description: Binary flag indicating if customer has passed KYC (1 = VERIFIED, 0 = other)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+      - name: country
+        description: Customer country of operation
+      - name: total_transactions
+        description: Total number of transactions initiated by this customer
+        tests:
+          - not_null
+      - name: dispute_count
+        description: Total number of disputes associated with customer transactions
+        tests:
+          - not_null
+      - name: unique_disputes
+        description: Count of unique disputes
+      - name: dispute_rate_pct
+        description: Percentage of transactions with disputes (0-100)
+      - name: account_age_days
+        description: Number of days since customer's first transaction
+      - name: first_transaction_date
+        description: Date of customer's first transaction
+      - name: last_transaction_date
+        description: Date of customer's most recent transaction
+      - name: risk_segment
+        description: Customer risk classification (low_risk, medium_risk, high_risk) based on dispute_rate_pct
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['low_risk', 'medium_risk', 'high_risk']
+      - name: customer_created_at
+        description: Timestamp when customer account was created
+      - name: customer_updated_at
+        description: Timestamp when customer profile was last updated
+      - name: dbt_created_at
+        description: Timestamp when this record was created by dbt
+
+  - name: stg_payment_method_risk
+    description: |
+      Payment method profiles with historical risk metrics and dispute patterns.
+      Aggregates transaction and dispute history per payment method to assess risk.
+      One row per unique payment method. Used for payment method-level fraud risk assessment.
+    columns:
+      - name: payment_method_id
+        description: Unique payment method identifier
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Customer who owns this payment method
+        tests:
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: method_type
+        description: Payment method type (e.g., card, bank_account, wallet)
+      - name: is_default
+        description: Whether this is the customer's default payment method
+      - name: total_transactions
+        description: Total number of transactions using this payment method
+        tests:
+          - not_null
+      - name: dispute_count
+        description: Total number of disputes for transactions using this method
+        tests:
+          - not_null
+      - name: unique_disputes
+        description: Count of unique disputes
+      - name: dispute_rate_pct
+        description: Percentage of transactions with disputes using this method (0-100)
+      - name: disputed_amount_pct
+        description: Percentage of total transaction amount that was disputed (0-100)
+      - name: method_age_days
+        description: Number of days since payment method was registered
+      - name: unique_customers_used
+        description: Number of unique customers who used this payment method
+      - name: first_transaction_date
+        description: Date of first transaction using this payment method
+      - name: last_transaction_date
+        description: Date of most recent transaction using this payment method
+      - name: risk_segment
+        description: Payment method risk classification (low_risk, medium_risk, high_risk) based on dispute_rate_pct
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['low_risk', 'medium_risk', 'high_risk']
+      - name: payment_method_created_at
+        description: Timestamp when payment method was registered
+      - name: payment_method_updated_at
+        description: Timestamp when payment method was last updated
+      - name: dbt_created_at
+        description: Timestamp when this record was created by dbt
+
+  - name: stg_customer_transaction_history
+    description: |
+      Customer-level aggregated transaction history for ML feature engineering.
+      One row per customer with counts, totals, and statistical measures across all transactions.
+      Includes fraud metrics, completion rates, and temporal features.
+      Primary source for customer behavioral features in fraud detection models.
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - not_null
+          - unique
+      - name: total_transactions
+        description: Total number of transactions initiated by customer
+        tests:
+          - not_null
+      - name: fraud_transactions
+        description: Number of transactions with disputes (fraud indicator)
+        tests:
+          - not_null
+      - name: legitimate_transactions
+        description: Number of transactions without disputes
+        tests:
+          - not_null
+      - name: total_amount
+        description: Sum of all transaction amounts
+      - name: avg_amount
+        description: Average transaction amount
+      - name: min_amount
+        description: Minimum transaction amount
+      - name: max_amount
+        description: Maximum transaction amount
+      - name: stddev_amount
+        description: Standard deviation of transaction amounts
+      - name: completed_transactions
+        description: Number of successfully completed transactions
+      - name: failed_transactions
+        description: Number of failed transactions
+      - name: pending_transactions
+        description: Number of pending transactions
+      - name: fraud_rate_pct
+        description: Percentage of transactions with disputes (0-100)
+      - name: first_transaction_date
+        description: Date of customer's first transaction
+      - name: last_transaction_date
+        description: Date of customer's most recent transaction
+      - name: days_active
+        description: Number of days between first and last transaction
+      - name: dbt_created_at
+        description: Timestamp when this record was created by dbt
