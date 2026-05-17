@@ -1,0 +1,18 @@
+name: postgres_transactions_to_iceberg_workflow
+description: PostgreSQL to GCS Iceberg ingestion pipeline - Executes daily transactions
+  data extraction and loads to Iceberg format with retry logic and notifications
+version: 1.0.0
+status: paused
+tags:
+- postgres
+- iceberg
+- gcs
+- ingestion
+- transactions
+- daily
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

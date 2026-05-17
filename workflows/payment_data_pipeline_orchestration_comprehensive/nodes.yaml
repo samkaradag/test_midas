@@ -1,0 +1,333 @@
+- node_id: agent_9eaf9d68
+  node_type: agent
+  label: 'Stage 6: Notifications & Reporting'
+  description: Comprehensive notifications, reporting, and stakeholder communication
+  position:
+    x: 6819.0
+    y: 120.0
+  config: {}
+  agent_id: notification_reporting_agent
+  agent_instructions: "Generate comprehensive notifications and reports:\n\n1. SUCCESS\
+    \ SCENARIO:\n   - Collect metrics:\n     * Total records synced (from ingestion)\n\
+    \     * Records processed by each dbt model\n     * Execution time (ingestion\
+    \ + dbt + validation)\n     * Data quality score (validation results)\n   - Generate\
+    \ success summary with:\n     * Pipeline execution timeline\n     * Record counts\
+    \ by table\n     * Performance metrics (execution time, optimization recommendations)\n\
+    \     * Cost analysis (BigQuery bytes processed)\n   - Send notification to stakeholders\
+    \ with dashboard link\n\n2. FAILURE SCENARIO:\n   - Collect error information:\n\
+    \     * Failed stage and error message\n     * Retry attempts and results\n  \
+    \   * Last successful run timestamp\n   - Generate detailed error report:\n  \
+    \   * Error description and root cause\n     * Troubleshooting steps\n     * Recommended\
+    \ actions\n     * Links to relevant logs\n   - Send alert to data engineering\
+    \ team with escalation\n\n3. WEEKLY SUMMARY (run every Monday 8 AM):\n   - Aggregate\
+    \ metrics from all runs in past 7 days:\n     * Success rate (%)\n     * Average\
+    \ execution time\n     * Total records processed\n     * Data quality trends\n\
+    \     * Cost trends\n   - Generate insights:\n     * Models with performance regressions\n\
+    \     * Optimization opportunities implemented\n     * Top cost drivers\n    \
+    \ * Recommended actions for next week\n   - Send to analytics and leadership team\n\
+    \n4. NOTIFICATION CHANNELS:\n   - Email for success/failure\n   - Slack for critical\
+    \ failures\n   - Dashboard updates for real-time monitoring"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_ce44a568
+  node_type: agent
+  label: Execution Metadata Logger
+  description: Comprehensive execution metadata logging for auditing and analytics
+  position:
+    x: 7379.0
+    y: 120.0
+  config: {}
+  agent_id: metadata_logger_agent
+  agent_instructions: "Log comprehensive execution metadata for auditing and monitoring:\n\
+    \n1. CAPTURE EXECUTION METADATA:\n   - Workflow run ID and timestamp\n   - Each\
+    \ stage: start time, end time, duration, status\n   - Ingestion: records synced,\
+    \ tables affected, sync mode (incremental/full)\n   - DBT: models executed, tests\
+    \ run, test results\n   - Validation: validation checks performed, issues found\n\
+    \   - Performance: execution times, optimization recommendations\n   - Errors:\
+    \ error messages, retry attempts, resolution status\n\n2. STORE IN CONTROL TABLE:\n\
+    \   - Table: workflow_execution_metadata\n   - Columns: run_id, workflow_name,\
+    \ stage, status, duration_seconds, records_processed, errors, created_at\n   -\
+    \ Also store: optimization_recommendations, cost_analysis, validation_results\n\
+    \n3. ENABLE AUDITING:\n   - Track who triggered the workflow (manual vs scheduled)\n\
+    \   - Log all modifications and remediation actions\n   - Maintain complete execution\
+    \ history for compliance\n\n4. SUPPORT ANALYTICS:\n   - Data for pipeline monitoring\
+    \ dashboard\n   - Trend analysis across runs\n   - Performance regression detection\n\
+    \   - Cost analysis and forecasting"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: condition_8ef91d99
+  node_type: condition
+  label: Validation Success Check
+  description: Check if data validation passed without critical issues
+  position:
+    x: 5065.0
+    y: 189.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: validation_status == 'success'
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_b4831e8c
+  node_type: condition
+  label: Ingestion Success Check
+  description: Check if Stage 1 ingestion completed successfully
+  position:
+    x: 1240.0
+    y: 132.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: ingestion_status == 'success'
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_bfdaedb2
+  node_type: condition
+  label: DBT Execution Success Check
+  description: Check if DBT run and test completed successfully
+  position:
+    x: 3480.0
+    y: 140.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: dbt_run_status == 'success'
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_1b28e2e9
+  node_type: pipeline
+  label: 'Stage 2a: DBT Run - Payments Silver Models'
+  description: 'Execute dbt run on payments_silver pipeline: staging, dimensions,
+    facts, and marts models'
+  position:
+    x: 2360.0
+    y: 120.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: payments_silver
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_silver_1768524807
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_e8ea8d75
+  node_type: pipeline
+  label: 'Stage 2b: DBT Test - Data Quality Validation'
+  description: Execute dbt test to validate data quality, referential integrity, and
+    uniqueness constraints
+  position:
+    x: 2920.0
+    y: 120.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: payments_silver
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_silver_1768524807
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: ingestion_a2e6f83e
+  node_type: pipeline
+  label: 'Stage 1: Ingest PostgreSQL Payments Data'
+  description: Execute Airbyte pipeline to sync PostgreSQL payments_v1 schema to BigQuery
+    with 30-minute timeout and record count capture
+  position:
+    x: 680.0
+    y: 120.0
+  config:
+    destination_connection_id: null
+    source_connection_id: null
+    sync_mode: full_refresh
+    tables: []
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: b7807895-a4d7-43bf-8ad6-054759dd976c
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: trigger_93c6eb69
+  node_type: trigger
+  label: Daily Trigger - 2 AM UTC
+  description: Daily trigger at 2 AM UTC for payment data pipeline orchestration
+  position:
+    x: 120.0
+    y: 131.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_0b1467eb
+  node_type: agent
+  label: 'Error Handler: DBT Remediation'
+  description: Diagnostic and recovery for DBT transformation failures
+  position:
+    x: 4032.0
+    y: 285.0
+  config: {}
+  agent_id: dbt_remediation_agent
+  agent_instructions: "Handle DBT transformation failures with diagnostics and recovery:\n\
+    1. Identify which models failed from dbt artifacts\n2. Run dbt debug to diagnose\
+    \ issues (database connectivity, schema issues)\n3. Attempt incremental refresh:\
+    \ dbt run --select state:error\n4. If still failing:\n   - Isolate failed models\
+    \ and run individually\n   - Check for circular dependencies or macro issues\n\
+    \   - Run dbt deps to refresh dependencies\n5. If recovery unsuccessful:\n   -\
+    \ Log detailed error report with manifest information\n   - Create incident ticket\
+    \ with failed model list\n   - Notify analytics team\n6. Store failure metadata\
+    \ for trend analysis"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_3be86c5c
+  node_type: agent
+  label: 'Stage 5: Performance Optimization Engine'
+  description: Advanced performance analysis with optimization recommendations and
+    cost analysis
+  position:
+    x: 6259.0
+    y: 120.0
+  config: {}
+  agent_id: performance_optimizer_agent
+  agent_instructions: "Analyze and optimize pipeline performance:\n\n1. DBT MODEL\
+    \ ANALYSIS:\n   - Extract execution times from dbt artifacts (run_results.json,\
+    \ manifest.json)\n   - Identify slow models (>5 minutes execution time)\n   -\
+    \ Calculate model dependencies and critical path\n\n2. MATERIALIZATION RECOMMENDATIONS:\n\
+    \   - For models <1min: Consider ephemeral materialization\n   - For models 1-5min:\
+    \ Recommend view materialization\n   - For models >5min: Recommend table or incremental\
+    \ materialization\n   - Suggest incremental materialization for large fact tables\n\
+    \n3. QUERY OPTIMIZATION:\n   - Analyze dbt compiled SQL for expensive operations\n\
+    \   - Flag models with:\n     * Expensive joins (multiple joins on non-indexed\
+    \ columns)\n     * Heavy aggregations (GROUP BY on high-cardinality columns)\n\
+    \     * Lack of partitioning on large tables\n   - Suggest index creation on frequently\
+    \ filtered columns\n\n4. BIGQUERY COST ANALYSIS:\n   - Query BigQuery INFORMATION_SCHEMA\
+    \ for:\n     * Rows scanned per model\n     * Bytes processed per query\n    \
+    \ * Slot usage patterns\n   - Calculate estimated cost (rows_scanned * $0.0025\
+    \ per GB)\n   - Identify high-cost models and optimization opportunities\n\n5.\
+    \ GENERATE RECOMMENDATIONS:\n   - Create structured optimization report with:\n\
+    \     * Model name, execution time, cost\n     * Specific optimization action\
+    \ (materialization change, index, partition)\n     * Estimated improvement (%\
+    \ reduction in time/cost)\n     * Implementation priority (high/medium/low)\n\n\
+    6. TREND ANALYSIS:\n   - Compare with previous runs to identify regressions\n\
+    \   - Track optimization impact over time\n   - Log all metrics for dashboard\
+    \ consumption"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_40cfcf6c
+  node_type: agent
+  label: 'Error Handler: Ingestion Retry Logic'
+  description: Auto-remediation for ingestion failures with exponential backoff retry
+    strategy
+  position:
+    x: 1797.0
+    y: 259.0
+  config: {}
+  agent_id: ingestion_retry_agent
+  agent_instructions: "Handle ingestion failures with auto-remediation:\n1. Log ingestion\
+    \ error with timestamp and error details\n2. Implement exponential backoff retry:\
+    \ 1st retry (30s), 2nd retry (2min), 3rd retry (5min)\n3. After each retry, check\
+    \ if pipeline succeeded\n4. If all 3 retries fail:\n   - Trigger manual alert\
+    \ to data engineering team\n   - Capture error logs and diagnostic information\n\
+    \   - Skip to next scheduled run\n   - Create incident ticket with failure details\n\
+    5. Track retry attempts in control table for auditing"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_5a31b0ac
+  node_type: agent
+  label: 'Stage 3: Data Validation Engine'
+  description: Advanced data validation checking nulls, duplicates, foreign keys,
+    and timestamp consistency
+  position:
+    x: 4599.0
+    y: 120.0
+  config: {}
+  agent_id: data_validation_agent
+  agent_instructions: 'Perform comprehensive data validation on payment data:
+
+    1. Check for nulls in key columns: transaction_id, customer_id, amount
+
+    2. Validate foreign key relationships between transactions, customers, payment_methods
+
+    3. Check for duplicate records using transaction_id
+
+    4. Verify timestamp consistency: created_at <= updated_at
+
+    5. Validate amount ranges (>0 for transactions)
+
+    6. Check for orphaned records (transactions without valid customer_id)
+
+    7. Generate validation report with row counts and anomalies'
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_5d3c9d49
+  node_type: agent
+  label: 'Error Handler: Data Healing'
+  description: Automatic data healing for validation failures
+  position:
+    x: 4722.0
+    y: 484.0
+  config: {}
+  agent_id: data_healing_agent
+  agent_instructions: "Handle data validation failures with auto-remediation:\n1.\
+    \ Log validation errors with specific row counts and affected columns\n2. For\
+    \ duplicate records: Remove duplicates using ROW_NUMBER() window function, keeping\
+    \ most recent\n3. For null values in non-critical columns: Fill with sensible\
+    \ defaults\n4. For timestamp inconsistencies: Correct using data lineage (set\
+    \ updated_at = created_at if needed)\n5. For orphaned records: Flag and optionally\
+    \ remove based on policy\n6. Re-run validation after healing to confirm fixes\n\
+    7. Generate healing report showing:\n   - Records removed (duplicates)\n   - Records\
+    \ updated (nulls filled)\n   - Records flagged (orphaned)\n8. Store healing metadata\
+    \ in audit table"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0

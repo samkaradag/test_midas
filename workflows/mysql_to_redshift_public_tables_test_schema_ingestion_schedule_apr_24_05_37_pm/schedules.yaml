@@ -1,0 +1,7 @@
+- name: 'Trigger: Schedule Trigger'
+  description: Auto-generated schedule for trigger node trigger_1
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

@@ -1,0 +1,10 @@
+- edge_id: edge_8ecaa336
+  source_node_id: trigger_72ffb475
+  target_node_id: dbt_746f871d
+  label: on_success
+  condition: null
+- edge_id: edge_53067baf
+  source_node_id: dbt_746f871d
+  target_node_id: notification_email_3c9d5146
+  label: on_success
+  condition: null

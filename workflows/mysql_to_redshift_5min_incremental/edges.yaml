@@ -1,0 +1,10 @@
+- edge_id: edge_1b3a1523
+  source_node_id: ingestion_262858aa
+  target_node_id: notification_webhook_79e5cc72
+  label: on_failure
+  condition: failure
+- edge_id: edge_35abc4ba
+  source_node_id: trigger_6da99ef0
+  target_node_id: ingestion_262858aa
+  label: on_schedule
+  condition: null

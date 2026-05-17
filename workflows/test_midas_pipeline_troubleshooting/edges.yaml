@@ -1,0 +1,15 @@
+- edge_id: edge_0e502bb2
+  source_node_id: trigger_36c0fe47
+  target_node_id: dbt_b5fdc57f
+  label: start
+  condition: null
+- edge_id: edge_e2f942b2
+  source_node_id: condition_01373361
+  target_node_id: agent_325fb35f
+  label: on_failure
+  condition: 'false'
+- edge_id: edge_9c06cca9
+  source_node_id: dbt_b5fdc57f
+  target_node_id: condition_01373361
+  label: check_status
+  condition: null

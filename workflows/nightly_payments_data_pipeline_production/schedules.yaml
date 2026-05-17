@@ -1,0 +1,7 @@
+- name: 'Trigger: Nightly Schedule Trigger (2 AM UTC)'
+  description: Auto-generated schedule for trigger node trigger_0c592f61
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

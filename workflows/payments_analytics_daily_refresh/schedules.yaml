@@ -1,0 +1,14 @@
+- name: Daily 2AM UTC Refresh
+  description: Automated daily refresh of payments analytics pipeline at 2:00 AM UTC
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: 'Trigger: Daily Schedule Trigger'
+  description: Auto-generated schedule for trigger node trigger_651c4175
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

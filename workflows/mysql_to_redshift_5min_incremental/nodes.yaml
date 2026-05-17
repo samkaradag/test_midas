@@ -1,0 +1,76 @@
+- node_id: ingestion_262858aa
+  node_type: pipeline
+  label: Run Incremental Sync
+  description: Triggers the MySQL to Redshift incremental sync pipeline
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    destination_connection_id: null
+    source_connection_id: null
+    sync_mode: full_refresh
+    tables: []
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: 1f059032-d199-4aa4-93e1-f96c34adcc0e
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: notification_webhook_79e5cc72
+  node_type: notification
+  label: Alert on Sync Failure
+  description: Sends failure notification when incremental sync fails
+  position:
+    x: 964.0
+    y: 195.0
+  config:
+    channel_type: webhook
+    include_previous_output: true
+    message: "\u26A0\uFE0F MySQL to Redshift incremental sync FAILED\\n\\nWorkflow:\
+      \ {{workflow_name}}\\nStatus: {{status}}\\nNode: {{node_name}}\\nTimestamp:\
+      \ {{timestamp}}\\n\\nPlease check the pipeline logs and retry manually if needed."
+    recipients: ''
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: trigger_6da99ef0
+  node_type: trigger
+  label: 5-Minute Schedule Trigger
+  description: Triggers the incremental sync every 5 minutes
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: '*/5 * * * *'
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_1777233870702
+  node_type: agent
+  label: Super Agent
+  description: AI agent for Super Agent tasks
+  position:
+    x: 800.0
+    y: 440.0
+  config: {}
+  agent_id: agent_team
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

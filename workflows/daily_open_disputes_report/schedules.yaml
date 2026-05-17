@@ -1,0 +1,14 @@
+- name: 'Trigger: Daily Trigger - 8:00 AM UTC'
+  description: Auto-generated schedule for trigger node trigger_72ffb475
+  schedule_type: cron
+  cron_expression: 0 8 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: Daily 8:00 AM UTC
+  description: Daily execution at 8:00 AM UTC for open disputes reporting
+  schedule_type: cron
+  cron_expression: 0 8 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

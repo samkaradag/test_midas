@@ -1,0 +1,16 @@
+name: test_midas Pipeline Troubleshooting
+description: Automated troubleshooting workflow for test_midas dbt pipeline. Runs
+  the pipeline, analyzes any failures, and proposes fixes through AI agents.
+version: 1.0.0
+status: draft
+tags:
+- dbt
+- troubleshooting
+- test_midas
+- error-analysis
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

@@ -1,0 +1,140 @@
+- node_id: dbt_e88b86b5
+  node_type: pipeline
+  label: Refresh rpt_daily_open_disputes Model
+  description: Execute the rpt_daily_open_disputes DBT model to refresh dispute analysis
+    data from BigQuery
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    full_refresh: false
+    models:
+    - rpt_daily_open_disputes
+    project_name: test_midas
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_test_midas_1771132375
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_email_0faaf347
+  node_type: notification
+  label: Failure Alert - Email Notification
+  description: Send failure notification email to s@dagen.ai when workflow encounters
+    errors
+  position:
+    x: 1500.0
+    y: 200.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: 'The daily disputes report workflow ({{workflow_name}}) failed at {{timestamp}}.\n\nNode:
+      {{node_name}}\nStatus: {{status}}\n\nPlease investigate immediately.\n\nDetails:\n{{previous_output}}'
+    recipients: s@dagen.ai
+    subject: "\u26A0\uFE0F Daily Disputes Report Workflow FAILED"
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: notification_email_e3bc6322
+  node_type: notification
+  label: Success Confirmation - Email Notification
+  description: Send success confirmation email to s@dagen.ai
+  position:
+    x: 1850.0
+    y: 200.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: 'The daily disputes report workflow ({{workflow_name}}) completed successfully
+      at {{timestamp}}.\n\nAll steps executed without errors:\n- DBT model refresh:
+      Complete\n- Email report sent: Complete\n- Execution status logged: Complete\n\nReport
+      has been delivered to stakeholders.'
+    recipients: s@dagen.ai
+    subject: "\u2705 Daily Disputes Report Workflow Completed Successfully"
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: spark_8fec8ff3
+  node_type: pipeline
+  label: Generate and Send Email Report
+  description: Execute Python script to generate disputes report and send via email
+    to stakeholders
+  position:
+    x: 800.0
+    y: 200.0
+  config:
+    is_notebook: false
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '1'
+        memory: 2Gi
+      timeout_minutes: 60
+    script_name: generate_disputes_report.py
+    script_path: generate_disputes_report.py
+    spark_config: {}
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: test_midas
+  pipeline_type: spark
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: spark_e40bdc2f
+  node_type: pipeline
+  label: Log Execution Status
+  description: Log workflow execution status and metrics for audit trail
+  position:
+    x: 1149.0
+    y: 200.0
+  config:
+    is_notebook: false
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '1'
+        memory: 2Gi
+      timeout_minutes: 60
+    script_name: log_execution_status.py
+    script_path: log_execution_status.py
+    spark_config: {}
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: test_midas
+  pipeline_type: spark
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: trigger_303443e9
+  node_type: trigger
+  label: Daily 8 AM UTC Trigger
+  description: Triggers the workflow daily at 8:00 AM UTC
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: 0 8 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

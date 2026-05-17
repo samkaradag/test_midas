@@ -1,0 +1,19 @@
+name: Daily PostgreSQL to BigQuery Ingestion + test_midas dbt
+description: "Automated daily workflow: PostgreSQL \u2192 BigQuery ingestion at 2\
+  \ AM UTC, followed by test_midas dbt transformation"
+version: 1.0.0
+status: paused
+tags:
+- daily
+- postgres
+- bigquery
+- ingestion
+- dbt
+- test_midas
+- transformation
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

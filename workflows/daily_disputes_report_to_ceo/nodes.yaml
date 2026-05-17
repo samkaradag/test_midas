@@ -1,0 +1,88 @@
+- node_id: spark_95be1b29
+  node_type: pipeline
+  label: Send Disputes Report Email
+  description: Executes Python job to send disputes report email to ceo@dagen.ai
+  position:
+    x: 800.0
+    y: 200.0
+  config:
+    is_notebook: false
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '1'
+        memory: 2Gi
+      timeout_minutes: 60
+    script_name: send_disputes_report.py
+    script_path: send_disputes_report.py
+    spark_config: {}
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: test_midas
+  pipeline_type: spark
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: trigger_2775bfe2
+  node_type: trigger
+  label: Weekday 8:00 AM Trigger
+  description: Triggers every weekday (Monday-Friday) at 8:00 AM
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: 0 8 * * 1-5
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_57d4f02d
+  node_type: pipeline
+  label: Refresh Disputes Data - DBT
+  description: Executes the rpt_open_disputes_daily model to refresh disputes reporting
+    data
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    full_refresh: false
+    models:
+    - rpt_open_disputes_daily
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_email_7e003c76
+  node_type: notification
+  label: Alert on Failure
+  description: Sends alert email when workflow fails
+  position:
+    x: 1150.0
+    y: 200.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: 'The daily disputes report workflow failed at {{node_name}}. Please check
+      the logs for details.\n\nWorkflow: {{workflow_name}}\nStatus: {{status}}\nTimestamp:
+      {{timestamp}}'
+    recipients: ceo@dagen.ai
+    subject: "\u26A0\uFE0F Daily Disputes Report Workflow Failed"
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0

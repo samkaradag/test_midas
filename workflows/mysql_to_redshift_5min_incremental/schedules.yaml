@@ -1,0 +1,7 @@
+- name: 'Trigger: 5-Minute Schedule Trigger'
+  description: Auto-generated schedule for trigger node trigger_6da99ef0
+  schedule_type: cron
+  cron_expression: '*/5 * * * *'
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

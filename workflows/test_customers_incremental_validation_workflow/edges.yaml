@@ -1,0 +1,5 @@
+- edge_id: edge_9dfd79fa
+  source_node_id: trigger_4c54e033
+  target_node_id: ingestion_a7b3275d
+  label: null
+  condition: null

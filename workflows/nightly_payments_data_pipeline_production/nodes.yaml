@@ -1,0 +1,110 @@
+- node_id: dbt_a9b34ea3
+  node_type: pipeline
+  label: 'DBT: Data Quality Tests'
+  description: 'Execute dbt test to validate data quality. Tests include: row count
+    validation, null value monitoring, duplicate detection, schema validation, referential
+    integrity checks. Timeout: 60 minutes. Failures are logged but do not block downstream
+    monitoring tasks.'
+  position:
+    x: 1800.0
+    y: 120.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: payments_silver
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_silver_1768524807
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: ingestion_2722828a
+  node_type: pipeline
+  label: "Airbyte: PostgreSQL \u2192 BigQuery Ingestion"
+  description: 'Airbyte ingestion pipeline: Load PostgreSQL payments_v1 schema to
+    BigQuery payments_bek dataset. Includes automatic retries (up to 3 times with
+    exponential backoff: 30s, 60s, 120s). Timeout: 60 minutes. On failure, logs error
+    but allows workflow to continue using cached data.'
+  position:
+    x: 680.0
+    y: 121.0
+  config:
+    destination_connection_id: null
+    source_connection_id: null
+    sync_mode: full_refresh
+    tables: []
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: cf1402a9-cb73-45cf-b721-580e55271e27
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: trigger_0c592f61
+  node_type: trigger
+  label: Nightly Schedule Trigger (2 AM UTC)
+  description: 'Triggers workflow every night at 2:00 AM UTC. Cron: 0 2 * * * (minute=0,
+    hour=2, day=any, month=any, weekday=any)'
+  position:
+    x: 120.0
+    y: 132.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_c4a86bbf
+  node_type: agent
+  label: Monitoring & Metrics Collection
+  description: AI agent for comprehensive monitoring and metrics collection. Collects
+    execution metrics (ingestion duration/throughput, dbt times, test results), validates
+    data quality (row counts, nulls, duplicates, schema), compares to baselines, and
+    sends detailed reports to super agent via webhook with all performance and quality
+    data.
+  position:
+    x: 2360.0
+    y: 120.0
+  config: {}
+  agent_id: data_insights_agent
+  agent_instructions: 'Collect and analyze workflow execution metrics and data quality
+    results. Tasks: 1) Calculate ingestion metrics (row counts, throughput, duration),
+    2) Analyze dbt compilation/run times, 3) Evaluate test results (pass/fail rates),
+    4) Compare row counts to baseline (alert if drop >10%), 5) Monitor null values
+    and duplicates, 6) Check schema consistency, 7) Prepare daily summary report,
+    8) Send metrics to super agent via webhook callback with execution timeline, data
+    volumes, quality scores, and performance metrics. Include error logs and recovery
+    actions taken.'
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: dbt_27146e0d
+  node_type: pipeline
+  label: 'DBT: Run Silver Layer Transformation'
+  description: 'Execute dbt run on payments_silver project to transform raw data into
+    silver layer. Includes 9 staging models with 5-step cleansing pipeline (deduplication,
+    test removal, standardization, null handling). Timeout: 60 minutes. On failure,
+    runs dbt parse and dbt compile for diagnostic purposes.'
+  position:
+    x: 1241.0
+    y: 120.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: payments_silver
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_silver_1768524807
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0

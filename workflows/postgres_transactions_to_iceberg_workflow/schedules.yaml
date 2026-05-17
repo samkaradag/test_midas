@@ -1,0 +1,15 @@
+- name: Daily Iceberg Ingestion - 02:00 UTC
+  description: Daily execution of PostgreSQL to GCS Iceberg ingestion at 02:00 UTC
+    with 30-minute timeout and 2 retries
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: 'Trigger: Daily Schedule Trigger'
+  description: Auto-generated schedule for trigger node trigger_67df8adf
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

@@ -1,0 +1,49 @@
+- node_id: spark_d849b5c3
+  node_type: pipeline
+  label: MySQL Table Discovery & Random Data Generation
+  description: Discovers all tables in MySQL, generates 5 random records per table
+    matching schema, and inserts them with logging
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    args: ''
+    connections:
+    - alias: MYSQL
+      connection_id: 125
+    environment_vars: {}
+    is_notebook: false
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '2'
+        memory: 4Gi
+      timeout_minutes: 5
+    script_name: mysql_random_data_ingestion.py
+    script_path: src/mysql_random_data_ingestion.py
+    spark_config: {}
+    wait_for_completion: true
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: mysql_random_data_ingestion
+  pipeline_type: spark
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: trigger_54b476d0
+  node_type: trigger
+  label: Every Minute Trigger
+  description: Triggers the workflow every minute
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: '* * * * *'
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

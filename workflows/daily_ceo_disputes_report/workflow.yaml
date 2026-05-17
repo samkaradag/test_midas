@@ -1,0 +1,17 @@
+name: daily_ceo_disputes_report
+description: Daily CEO disputes report workflow that runs the disputes_reporting DBT
+  pipeline and sends an HTML email with open disputes analysis to the CEO
+version: 1.0.0
+status: paused
+tags:
+- disputes
+- reporting
+- ceo
+- daily
+- email
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

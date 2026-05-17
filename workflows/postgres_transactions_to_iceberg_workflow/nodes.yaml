@@ -1,0 +1,91 @@
+- node_id: trigger_67df8adf
+  node_type: trigger
+  label: Daily Schedule Trigger
+  description: Scheduled trigger for daily execution at 02:00 UTC
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: spark_0bfa7800
+  node_type: pipeline
+  label: PostgreSQL to Iceberg Ingestion
+  description: Execute transactions data extraction from PostgreSQL and load to GCS
+    Iceberg format
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    is_notebook: false
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '4'
+        memory: 8Gi
+      timeout_minutes: 30
+    script_name: transactions_iceberg_ingestion.py
+    script_path: notebooks/transactions_iceberg_ingestion.py
+    spark_config: {}
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: postgres-to-iceberg-ingestion
+  pipeline_type: spark
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_slack_f902ce35
+  node_type: notification
+  label: Notify Failure
+  description: Slack notification on ingestion failure
+  position:
+    x: 1150.0
+    y: 200.0
+  config:
+    channel_id: 1
+    channel_type: slack
+    include_previous_output: true
+    message: "\u274C PostgreSQL to Iceberg ingestion FAILED!\\n\\n**Workflow:** {{workflow_name}}\\\
+      n**Status:** {{status}}\\n**Node:** {{node_name}}\\n**Timestamp:** {{timestamp}}\\\
+      n**Error Details:**\\n{{previous_output}}\\n\\nPlease investigate and retry\
+      \ the ingestion."
+    recipients: ''
+    subject: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: notification_slack_07c18900
+  node_type: notification
+  label: Notify Success
+  description: Slack notification on successful ingestion completion
+  position:
+    x: 800.0
+    y: 200.0
+  config:
+    channel_id: 1
+    channel_type: slack
+    include_previous_output: true
+    message: "\u2705 PostgreSQL to Iceberg ingestion completed successfully!\\n\\\
+      n**Workflow:** {{workflow_name}}\\n**Status:** {{status}}\\n**Node:** {{node_name}}\\\
+      n**Timestamp:** {{timestamp}}\\n\\nTransactions data has been successfully extracted\
+      \ from PostgreSQL and loaded to GCS Iceberg format."
+    recipients: ''
+    subject: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0

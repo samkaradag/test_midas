@@ -1,0 +1,80 @@
+- edge_id: edge_3af5f81e
+  source_node_id: trigger_93c6eb69
+  target_node_id: ingestion_a2e6f83e
+  label: Start Workflow
+  condition: null
+- edge_id: edge_f7d71cd0
+  source_node_id: agent_40cfcf6c
+  target_node_id: dbt_1b28e2e9
+  label: Continue After Retry
+  condition: null
+- edge_id: edge_4379da60
+  source_node_id: dbt_1b28e2e9
+  target_node_id: dbt_e8ea8d75
+  label: Run Tests
+  condition: null
+- edge_id: edge_b61ca922
+  source_node_id: agent_0b1467eb
+  target_node_id: agent_5a31b0ac
+  label: Continue After Remediation
+  condition: null
+- edge_id: edge_4fedd7f6
+  source_node_id: agent_5a31b0ac
+  target_node_id: condition_8ef91d99
+  label: Check Validation Results
+  condition: null
+- edge_id: edge_bf143e10
+  source_node_id: agent_3be86c5c
+  target_node_id: agent_9eaf9d68
+  label: Generate Report
+  condition: null
+- edge_id: edge_26a82037
+  source_node_id: agent_9eaf9d68
+  target_node_id: agent_ce44a568
+  label: Log Metadata
+  condition: null
+- edge_id: edge_05055b6b
+  source_node_id: ingestion_a2e6f83e
+  target_node_id: condition_b4831e8c
+  label: Check Status
+  condition: null
+- edge_id: edge_febb131b
+  source_node_id: dbt_e8ea8d75
+  target_node_id: condition_bfdaedb2
+  label: Check Test Results
+  condition: null
+- edge_id: edge_0bbc5a6c
+  source_node_id: condition_8ef91d99
+  target_node_id: agent_3be86c5c
+  label: Success - Optimize
+  condition: 'true'
+- edge_id: edge_26d67605
+  source_node_id: condition_b4831e8c
+  target_node_id: dbt_1b28e2e9
+  label: Success - Continue
+  condition: 'true'
+- edge_id: edge_9c2b0130
+  source_node_id: condition_bfdaedb2
+  target_node_id: agent_5a31b0ac
+  label: Success - Validate Data
+  condition: 'true'
+- edge_id: edge_11eab4b9
+  source_node_id: condition_8ef91d99
+  target_node_id: agent_5d3c9d49
+  label: Failure - Heal Data
+  condition: 'false'
+- edge_id: edge_4ad998af
+  source_node_id: condition_b4831e8c
+  target_node_id: agent_40cfcf6c
+  label: Failure - Retry
+  condition: 'false'
+- edge_id: edge_ad775226
+  source_node_id: condition_bfdaedb2
+  target_node_id: agent_0b1467eb
+  label: Failure - Remediate
+  condition: 'false'
+- edge_id: edge_55ab34a0
+  source_node_id: agent_5d3c9d49
+  target_node_id: agent_3be86c5c
+  label: Continue After Healing
+  condition: null

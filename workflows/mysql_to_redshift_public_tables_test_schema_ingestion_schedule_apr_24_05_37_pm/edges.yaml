@@ -1,0 +1,5 @@
+- edge_id: edge_1
+  source_node_id: trigger_1
+  target_node_id: ingestion_1
+  label: On Schedule
+  condition: null

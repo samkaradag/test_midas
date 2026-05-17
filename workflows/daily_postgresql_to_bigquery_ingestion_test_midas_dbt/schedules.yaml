@@ -1,0 +1,15 @@
+- name: Daily Ingestion and Transformation
+  description: Runs PostgreSQL to BigQuery ingestion followed by test_midas dbt transformation
+    daily at 2 AM UTC
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: 'Trigger: Daily Trigger'
+  description: Auto-generated schedule for trigger node trigger_b07be640
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

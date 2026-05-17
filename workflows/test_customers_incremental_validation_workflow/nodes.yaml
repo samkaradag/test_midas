@@ -1,0 +1,37 @@
+- node_id: ingestion_a7b3275d
+  node_type: pipeline
+  label: Customers Incremental Sync
+  description: null
+  position:
+    x: 681.0
+    y: 120.0
+  config:
+    destination_connection_id: 126
+    source_connection_id: 125
+    sync_mode: incremental
+    tables:
+    - airbyte_raw_customers
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: 91852b2b-d6bb-49b1-9089-a32a2eccb01d
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: trigger_4c54e033
+  node_type: trigger
+  label: Schedule Trigger - Every 5 Minutes
+  description: null
+  position:
+    x: 120.0
+    y: 132.0
+  config:
+    expression: '*/5 * * * *'
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

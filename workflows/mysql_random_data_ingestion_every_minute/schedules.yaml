@@ -1,0 +1,14 @@
+- name: 'Trigger: Every Minute Trigger'
+  description: Auto-generated schedule for trigger node trigger_54b476d0
+  schedule_type: cron
+  cron_expression: '* * * * *'
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: Every Minute Schedule
+  description: Executes the MySQL random data ingestion workflow every minute
+  schedule_type: cron
+  cron_expression: '* * * * *'
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

@@ -1,0 +1,14 @@
+- name: Daily Disputes Report - 8 AM UTC
+  description: Scheduled execution of daily disputes report workflow at 8:00 AM UTC
+  schedule_type: cron
+  cron_expression: 0 8 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: 'Trigger: Daily 8 AM UTC Trigger'
+  description: Auto-generated schedule for trigger node trigger_303443e9
+  schedule_type: cron
+  cron_expression: 0 8 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

@@ -1,0 +1,40 @@
+- edge_id: edge_7be13f94
+  source_node_id: pipeline_1776179718403
+  target_node_id: condition_9c314bd1
+  label: check status
+  condition: null
+- edge_id: edge_58fe7087
+  source_node_id: condition_9c314bd1
+  target_node_id: ingestion_ed31746d
+  label: on success
+  condition: 'true'
+- edge_id: edge_315ddda6
+  source_node_id: condition_9c314bd1
+  target_node_id: agent_310bbb29
+  label: on failure
+  condition: 'false'
+- edge_id: edge_841d4e1f
+  source_node_id: trigger_b07be640
+  target_node_id: ingestion_ed31746d
+  label: on_success
+  condition: null
+- edge_id: edge_b16d0a1b
+  source_node_id: ingestion_ed31746d
+  target_node_id: dbt_68b9aba0
+  label: on_success
+  condition: null
+- edge_id: edge_be6ff634
+  source_node_id: agent_87fe1fa9
+  target_node_id: notification_slack_8e6e2be9
+  label: on_success
+  condition: null
+- edge_id: edge_956e070e
+  source_node_id: dbt_68b9aba0
+  target_node_id: condition_2f9ec55a
+  label: always
+  condition: null
+- edge_id: edge_06b67a52
+  source_node_id: condition_2f9ec55a
+  target_node_id: agent_87fe1fa9
+  label: on_failure
+  condition: 'false'

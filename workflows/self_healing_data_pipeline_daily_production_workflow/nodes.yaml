@@ -1,0 +1,690 @@
+- node_id: agent_51007eea
+  node_type: agent
+  label: 'Super Agent: PII Data Governance & Compliance Check'
+  description: ''
+  position:
+    x: 7400.0
+    y: 248.0
+  config: {}
+  agent_id: data_insights_agent
+  agent_instructions: "Advanced PII detection, data governance, and compliance validation\
+    \ system:\n\n**PII DETECTION & CLASSIFICATION PHASE:**\n\n1. **Sensitive Field\
+    \ Identification:**\n   - Email addresses (pattern: *@*.*)\n   - Phone numbers\
+    \ (pattern: +1-XXX-XXX-XXXX or variations)\n   - Social Security Numbers (pattern:\
+    \ XXX-XX-XXXX)\n   - Credit card numbers (pattern: 4111-XXXX-XXXX-XXXX, etc.)\n\
+    \   - Bank account numbers (pattern: routing + account)\n   - Passport/ID numbers\n\
+    \   - Date of birth (correlate with age calculations)\n   - Full names (especially\
+    \ in combination with other PII)\n   - IP addresses (IPv4/IPv6 patterns)\n   -\
+    \ Tax IDs and national identifiers\n   - Driver license numbers\n   - Biometric\
+    \ data (fingerprints, facial recognition)\n\n2. **Column-Level Analysis:**\n \
+    \  - Scan all columns in staging, dimensions, and facts tables\n   - Classify\
+    \ each column: PUBLIC, INTERNAL, CONFIDENTIAL, RESTRICTED\n   - Identify composite\
+    \ PII (name + DOB = high risk)\n   - Flag unexpected PII in non-PII columns\n\n\
+    3. **Data Pattern Matching:**\n   - Use regex patterns for common PII formats\n\
+    \   - Analyze column names for PII hints (email, phone, ssn, etc.)\n   - Check\
+    \ data type mismatches (string fields with numeric PII)\n   - Detect encoded/hashed\
+    \ PII (MD5, SHA1, SHA256 patterns)\n\n**GOVERNANCE VALIDATION:**\n\n1. **Access\
+    \ Control Verification:**\n   - Confirm PII columns have restricted BigQuery access\n\
+    \   - Validate IAM roles limit PII access to authorized users only\n   - Check\
+    \ for overly permissive dataset/table permissions\n   - Verify service accounts\
+    \ have minimal necessary access\n\n2. **Encryption Status Check:**\n   - Verify\
+    \ PII columns use BigQuery column-level encryption\n   - Check encryption keys\
+    \ are rotated regularly\n   - Validate encryption at rest and in transit\n   -\
+    \ Flag any unencrypted PII columns\n\n3. **Data Masking & Redaction:**\n   - Verify\
+    \ PII is masked/redacted in non-production environments\n   - Check for proper\
+    \ tokenization of sensitive values\n   - Validate hashing algorithms (bcrypt,\
+    \ scrypt, Argon2)\n   - Ensure masking is applied consistently across all PII\
+    \ columns\n\n4. **Retention Policy Compliance:**\n   - Verify PII retention policies\
+    \ are documented\n   - Check deletion/archival schedules are enforced\n   - Validate\
+    \ GDPR/CCPA compliance (right to be forgotten)\n   - Monitor for PII data older\
+    \ than retention threshold\n\n**COMPLIANCE CHECKS:**\n\n1. **Regulatory Compliance:**\n\
+    \   - GDPR: Verify consent tracking and right to erasure mechanisms\n   - CCPA:\
+    \ Check California resident data is properly flagged\n   - HIPAA: Validate PHI\
+    \ (Protected Health Information) handling if applicable\n   - PCI-DSS: Confirm\
+    \ payment card data handling compliance\n   - SOC 2: Verify audit logging and\
+    \ access controls\n\n2. **Data Lineage & Audit Trail:**\n   - Track PII from source\
+    \ \u2192 staging \u2192 dimensions \u2192 facts\n   - Log all PII access and transformations\n\
+    \   - Maintain audit trail for compliance investigations\n   - Document data flow\
+    \ for DPA (Data Processing Agreement) purposes\n\n3. **Third-Party Data Sharing:**\n\
+    \   - Identify which PII columns are shared with external systems\n   - Verify\
+    \ data sharing agreements are in place\n   - Check consent flags before sharing\
+    \ customer data\n   - Validate anonymization before external sharing\n\n**ANOMALY\
+    \ DETECTION FOR PII:**\n\n1. **Unexpected PII Exposure:**\n   - Alert if PII appears\
+    \ in unexpected tables/columns\n   - Flag if unencrypted PII is detected\n   -\
+    \ Detect new PII sources not previously documented\n   - Identify PII appearing\
+    \ in logs or error messages\n\n2. **Access Anomalies:**\n   - Monitor for unusual\
+    \ access patterns to PII columns\n   - Alert on bulk data exports of PII\n   -\
+    \ Flag access from unexpected IP ranges\n   - Track access outside normal business\
+    \ hours\n\n3. **Data Quality Issues with PII:**\n   - Check for null rates in\
+    \ critical PII fields\n   - Detect duplicate customer records (identity fraud\
+    \ risk)\n   - Identify mismatched PII (email format errors, invalid phone numbers)\n\
+    \   - Flag suspicious value distributions (all same SSN, etc.)\n\n**REMEDIATION\
+    \ & ENFORCEMENT:**\n\n1. **Auto-Fix Actions (Safe):**\n   - Add encryption to\
+    \ unencrypted PII columns\n   - Apply standard masking patterns to exposed PII\n\
+    \   - Update IAM policies to restrict access\n   - Enable column-level security\
+    \ policies\n\n2. **Manual Review Required:**\n   - Unexpected PII in non-standard\
+    \ locations\n   - Complex compliance violations\n   - Potential data breaches\
+    \ or unauthorized exposure\n   - Cross-regulatory compliance conflicts\n\n3. **Escalation\
+    \ Triggers:**\n   - CRITICAL: Unencrypted PII in production\n   - CRITICAL: Unauthorized\
+    \ access detected\n   - CRITICAL: PII in logs or error messages\n   - HIGH: Retention\
+    \ policy violations\n   - HIGH: Missing access controls\n   - MEDIUM: Data quality\
+    \ issues with PII\n\n**REPORTING & ALERTS:**\n\n1. **PII Governance Report:**\n\
+    \   - Total PII columns identified: X\n   - Encrypted: Y (%)\n   - Masked: Z (%)\n\
+    \   - Access-controlled: W (%)\n   - Compliance status: GREEN/YELLOW/RED\n\n2.\
+    \ **Slack Notifications:**\n   - **PASS:** \"\u2705 PII Governance Check PASSED:\
+    \ All 47 PII columns encrypted & access-controlled. Compliance: GDPR \u2713 CCPA\
+    \ \u2713 SOC2 \u2713\"\n   - **WARNING:** \"\u26A0\uFE0F PII Governance Issues:\
+    \ 3 columns missing encryption, 2 access violations detected. Manual review required.\"\
+    \n   - **CRITICAL:** \"\U0001F6A8 CRITICAL PII EXPOSURE: Unencrypted SSN data\
+    \ detected in mart_customer_summary. Immediate action required!\"\n\n3. **Audit\
+    \ Logging:**\n   - Log all PII checks to compliance_audit_log table\n   - Document\
+    \ findings, remediation actions, and approvals\n   - Generate compliance reports\
+    \ for auditors\n   - Track PII incidents and resolutions\n\n**DOCUMENTATION:**\n\
+    - Generate PII inventory with classification levels\n- Document data lineage for\
+    \ each PII column\n- Create compliance mapping (GDPR articles, CCPA sections,\
+    \ etc.)\n- Maintain remediation action tracker\n\nReturn: {\n  pii_columns_found:\
+    \ count,\n  encrypted_count: count,\n  masked_count: count,\n  access_controlled_count:\
+    \ count,\n  compliance_status: 'GREEN'|'YELLOW'|'RED',\n  critical_issues: [],\n\
+    \  warnings: [],\n  remediation_applied: [],\n  audit_logged: true,\n  alerts_sent:\
+    \ true,\n  pass: true|false\n}"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: condition_d66cac66
+  node_type: condition
+  label: 'Check: PII Governance Compliant?'
+  description: Validates PII governance compliance. Ensures all sensitive data is
+    encrypted, access-controlled, and meets regulatory requirements (GDPR, CCPA, SOC2).
+  position:
+    x: 7960.0
+    y: 239.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: compliance_status == 'GREEN' and critical_issues == 0
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_slack_07ffaefa
+  node_type: notification
+  label: 'Slack: PII Governance Violation Alert'
+  description: "\U0001F4AC Send slack notification"
+  position:
+    x: 8520.0
+    y: 235.0
+  config:
+    channel_type: slack
+    include_previous_output: true
+    message: "\U0001F6A8 **CRITICAL: PII GOVERNANCE VIOLATION DETECTED**\n\n**Workflow:**\
+      \ {{workflow_name}}\n\n**Compliance Status:** {{previous_output}}\n\n**Issues\
+      \ Identified:**\n- Unencrypted PII columns detected\n- Access control violations\n\
+      - Retention policy breaches\n- Potential data exposure risks\n\n**Required Actions:**\n\
+      1. Immediately review compliance violations\n2. Verify encryption status of\
+      \ all PII columns\n3. Audit access logs for unauthorized access\n4. Escalate\
+      \ to Data Governance & Security teams\n5. Check for potential data breach indicators\n\
+      \n**Escalation Level:** CRITICAL \U0001F534\n**Timestamp:** {{timestamp}}\n\n\
+      <@data-governance-lead> <@security-team> - Immediate action required!"
+    recipients: ''
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: condition_3968659b
+  node_type: condition
+  label: 'Check: Schema Evolution Issues?'
+  description: Determines if critical schema evolution issues require escalation
+  position:
+    x: 2360.0
+    y: 239.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: schema_changes_detected == true and critical_issues > 0
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_slack_0fbc1c99
+  node_type: notification
+  label: 'Slack: CRITICAL Schema Evolution Issue'
+  description: "\U0001F4AC Send slack notification"
+  position:
+    x: 2920.0
+    y: 334.0
+  config:
+    channel_type: slack
+    include_previous_output: true
+    message: "\U0001F6A8 **CRITICAL SCHEMA EVOLUTION ISSUE - MANUAL INTERVENTION REQUIRED**\n\
+      \n**Workflow:** {{workflow_name}}\n\n**Issue Details:** {{previous_output}}\n\
+      \n**Critical Changes Detected:**\n- Breaking schema changes identified\n- Primary\
+      \ key or constraint modifications\n- Data type incompatibilities\n- Multiple\
+      \ simultaneous changes requiring validation\n\n**Required Actions:**\n1. Review\
+      \ schema changes immediately in workflow logs\n2. Validate impact on downstream\
+      \ dbt models\n3. Approve or reject schema modifications\n4. Execute approved\
+      \ changes or rollback\n\n**Escalation Level:** CRITICAL \U0001F534\n**Timestamp:**\
+      \ {{timestamp}}\n\n<@data-engineering-lead> - Please review and take action."
+    recipients: ''
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: agent_d8ca9545
+  node_type: agent
+  label: 'Success: Publish Metrics & Send Notifications'
+  description: Publishes pipeline success metrics to monitoring systems and sends
+    notifications to stakeholders.
+  position:
+    x: 10200.0
+    y: 334.0
+  config: {}
+  agent_id: data_insights_agent
+  agent_instructions: "Publish successful pipeline completion metrics and notifications:\n\
+    \n**METRICS COLLECTION:**\n1. Pipeline execution summary:\n   - Total runtime\
+    \ (ingestion + staging + dimensions + facts + marts)\n   - Records processed per\
+    \ table (customers, transactions, etc.)\n   - dbt test results (passed/failed/skipped)\n\
+    \   - Data quality score and anomalies_found count\n\n2. Performance metrics:\n\
+    \   - Ingestion duration and throughput (records/sec)\n   - dbt model execution\
+    \ times (slowest models)\n   - Quality check duration\n   - Total pipeline duration\n\
+    \n3. Data freshness metrics:\n   - Latest record timestamp vs. ingestion time\n\
+    \   - Data lag in hours\n   - Completeness percentage per critical table\n\n**PUBLISH\
+    \ METRICS:**\n- Send to monitoring dashboard (Datadog/New Relic)\n- Update BigQuery\
+    \ monitoring tables (pipeline_runs, data_quality_metrics)\n- Log to CloudLogging\
+    \ for audit trail\n\n**SEND NOTIFICATIONS:**\n- Slack #data-pipeline channel:\
+    \ \"\u2705 Daily pipeline completed successfully at 2:15 AM UTC. Quality score:\
+    \ 98. Records: 1,245. Lag: 45 min.\"\n- Email summary to data-team@company.com\
+    \ with:\n  - Execution timeline\n  - Quality scorecard\n  - Top 5 slowest models\n\
+    \  - Any warnings/anomalies detected\n  \n**DASHBOARD UPDATES:**\n- Update \"\
+    Last Successful Run\" timestamp\n- Refresh data freshness indicators\n- Update\
+    \ SLA compliance metrics\n\nReturn: {metrics_published: true, notifications_sent:\
+    \ true, dashboard_updated: true}"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: condition_01751a1d
+  node_type: condition
+  label: 'Check: All dbt Tests Pass?'
+  description: Validates all dbt tests pass across dimensions, facts, and marts. Checks
+    data freshness, completeness, and business logic.
+  position:
+    x: 6280.0
+    y: 239.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: dbt_test_failures == 0 and all_models_built == true
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_268e8b31
+  node_type: condition
+  label: 'Check: Ingestion Success?'
+  description: "Validates ingestion completed successfully with records synced. If\
+    \ fails, triggers retry logic with exponential backoff (1s \u2192 2s \u2192 4s)."
+  position:
+    x: 1240.0
+    y: 239.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: status == 'success' and records_synced > 0
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_ad8dcc69
+  node_type: condition
+  label: 'Check: Recovery Successful?'
+  description: Validates auto-recovery was successful. If recovery failed, initiates
+    rollback sequence.
+  position:
+    x: 9640.0
+    y: 239.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: recovery_action != 'none' and quality_score >= 95
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_f7b682aa
+  node_type: condition
+  label: 'Check: Staging Tests Pass?'
+  description: Validates all dbt tests pass in staging layer. Checks for data quality
+    issues, referential integrity, and uniqueness constraints.
+  position:
+    x: 4040.0
+    y: 239.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: dbt_test_failures == 0 and row_count > 0
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_fd64e436
+  node_type: condition
+  label: "Check: Quality Score \u2265 95?"
+  description: Validates data quality score meets production threshold (95%). If score
+    < 95, triggers investigation and potential rollback.
+  position:
+    x: 8520.0
+    y: 433.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: quality_score >= 95 and anomalies_found == 0
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_1074a76b
+  node_type: agent
+  label: 'Super Agent: Anomaly Investigation & Auto-Recovery'
+  description: Super agent for intelligent anomaly investigation, root cause analysis,
+    and automatic recovery. Implements self-healing logic with rollback capabilities.
+  position:
+    x: 9080.0
+    y: 227.0
+  config: {}
+  agent_id: dbt_agent
+  agent_instructions: "Intelligent anomaly investigation and auto-recovery system:\n\
+    \n**ANOMALY ANALYSIS PHASE:**\n1. Correlate detected anomalies with recent changes\
+    \ (schema updates, ingestion patterns, dbt model changes)\n2. Analyze historical\
+    \ baselines - compare current metrics against 7-day/30-day rolling averages\n\
+    3. Identify root cause: data source issue, transformation logic, or genuine business\
+    \ event\n4. Classify anomaly type: data quality issue, schema drift, volume spike,\
+    \ distribution change\n\n**AUTO-RECOVERY STRATEGIES:**\n1. **If data quality issue\
+    \ detected:**\n   - Run targeted dbt tests on affected models\n   - Auto-fix:\
+    \ null imputation, type coercion, deduplication if safe\n   - Regenerate affected\
+    \ marts with cleansed data\n   \n2. **If schema drift detected:**\n   - Validate\
+    \ new columns against source schema\n   - Auto-update dbt models if changes are\
+    \ additive\n   - Trigger schema refresh in BigQuery if needed\n\n3. **If volume\
+    \ anomaly (genuine spike):**\n   - Validate against business calendar (holidays,\
+    \ events)\n   - Adjust expectations if legitimate\n   - No recovery action needed\n\
+    \n4. **If transformation logic issue:**\n   - Compare current dbt run logs against\
+    \ baseline\n   - Identify failing models or tests\n   - Suggest dbt model corrections\n\
+    \n**RECOVERY EXECUTION:**\n- Execute safe auto-fixes automatically (null imputation,\
+    \ deduplication)\n- For risky changes: create rollback snapshot and execute with\
+    \ verification\n- Re-run quality checks post-recovery\n- If recovery fails or\
+    \ quality still < 95%: escalate to manual review\n\n**ALERTING:**\n- Slack: Immediate\
+    \ alert for CRITICAL anomalies\n- Email: Daily summary of all detected issues\
+    \ and recovery actions\n- Dashboard: Real-time quality metrics and anomaly trends\n\
+    \nReturn: {recovery_action, success, quality_score_after_recovery, alert_sent}"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_1d854775
+  node_type: agent
+  label: 'Failure: Alert & Log for Investigation'
+  description: Handles pipeline failures with critical alerting, forensics logging,
+    and incident management.
+  position:
+    x: 10760.0
+    y: 227.0
+  config: {}
+  agent_id: data_insights_agent
+  agent_instructions: "Handle pipeline failures with comprehensive alerting and forensics\
+    \ logging:\n\n**IMMEDIATE ALERTS:**\n1. Send CRITICAL Slack alert to #data-incidents:\n\
+    \   - Failure stage (ingestion, staging, dimensions, facts, marts, quality check)\n\
+    \   - Error message and stack trace\n   - Affected tables and estimated data gap\n\
+    \   - Recommended remediation steps\n\n2. Send email to on-call engineer with:\n\
+    \   - Full error context\n   - Link to workflow run logs\n   - Last successful\
+    \ run timestamp\n   - Data freshness impact assessment\n\n3. PagerDuty alert if\
+    \ pipeline SLA breached (no data for > 4 hours)\n\n**FORENSICS LOGGING:**\n1.\
+    \ Export detailed logs:\n   - Ingestion logs (Airbyte connector output)\n   -\
+    \ dbt compilation and run logs\n   - Data quality check results\n   - Stack traces\
+    \ and error details\n\n2. Create incident record with:\n   - Failure timestamp\n\
+    \   - Affected data (which tables, row counts)\n   - Root cause (if identifiable)\n\
+    \   - Impact assessment (downstream dashboards affected)\n\n3. Archive to gs://incident-logs/{date}/{workflow_id}/\n\
+    \n**IMPACT ASSESSMENT:**\n- Identify downstream dependencies (dashboards, reports)\n\
+    - Estimate data staleness impact\n- Calculate SLA breach duration\n\n**PREVENTION:**\n\
+    - Suggest monitoring enhancements\n- Recommend timeout adjustments if needed\n\
+    - Document lessons learned\n\nReturn: {alerts_sent: true, logs_exported: true,\
+    \ incident_created: true}"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: dbt_a59dffdd
+  node_type: pipeline
+  label: 'dbt: Facts Layer (fact_*)'
+  description: 'Third layer: fact tables with grain definition, foreign keys to dimensions,
+    degenerate dimensions. Aggregation-ready for analytics.'
+  position:
+    x: 5160.0
+    y: 227.0
+  config:
+    full_refresh: false
+    models:
+    - fact_transactions
+    - fact_payouts
+    - fact_refunds
+    - fact_disputes
+    project_name: payments_model
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_model_1765342439
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: ingestion_e08b46a0
+  node_type: pipeline
+  label: "Airbyte: PostgreSQL \u2192 BigQuery (CDC Incremental)"
+  description: 'CDC-based incremental sync from PostgreSQL payments_v1 schema (9 tables:
+    customers, payment_methods, transactions, etc.) to BigQuery prd-dagen.payments_v1
+    dataset. Handles: schema evolution, CDC events, deduplication, type coercion.'
+  position:
+    x: 680.0
+    y: 227.0
+  config:
+    destination_connection_id: null
+    source_connection_id: null
+    sync_mode: full_refresh
+    tables: []
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: a312efc4-19f5-4b6f-8d76-0fa85f6fb4ef
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: trigger_c9627ad2
+  node_type: trigger
+  label: Daily Schedule - 2 AM UTC
+  description: Triggers daily at 2 AM UTC with exponential backoff retry logic (3
+    retries)
+  position:
+    x: 120.0
+    y: 239.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_22edd08a
+  node_type: agent
+  label: Rollback & Restore Previous State
+  description: Controlled rollback mechanism to restore previous stable state when
+    auto-recovery fails. Preserves forensics data for root cause analysis.
+  position:
+    x: 10200.0
+    y: 120.0
+  config: {}
+  agent_id: dbt_agent
+  agent_instructions: "Execute controlled rollback to restore previous stable state:\n\
+    \n**ROLLBACK SEQUENCE:**\n1. **Identify Last Good State:**\n   - Locate previous\
+    \ successful workflow run with quality_score >= 95\n   - Verify rollback target\
+    \ has all required data (no gaps)\n\n2. **Snapshot Current State (for forensics):**\n\
+    \   - Export current problematic data to gs://backup/failed_run_{timestamp}/\n\
+    \   - Preserve dbt run logs and quality reports for investigation\n   - Document\
+    \ anomalies that triggered rollback\n\n3. **Restore BigQuery Tables:**\n   - Revert\
+    \ fact tables to last good snapshot\n   - Revert marts to last good snapshot\n\
+    \   - Keep staging/dimensions as-is (source of truth from ingestion)\n   - Validate\
+    \ table row counts match expected baseline\n\n4. **Verify Rollback:**\n   - Run\
+    \ data quality checks on restored tables\n   - Confirm quality_score >= 95 on\
+    \ rolled-back data\n   - Validate no data loss for critical tables\n\n5. **Notify\
+    \ & Document:**\n   - Send CRITICAL alert: \"Rollback executed - investigate root\
+    \ cause\"\n   - Log rollback reason, timestamp, and restored state\n   - Create\
+    \ incident ticket for manual review\n\n6. **Mark Workflow State:**\n   - Set workflow\
+    \ status to 'ROLLED_BACK'\n   - Prevent automatic retry until manual approval\n\
+    \   - Flag for engineering team review\n\nReturn: {rollback_status: 'success'|'failed',\
+    \ tables_restored, quality_verified, alert_sent}"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_c37ef968
+  node_type: agent
+  label: Data Quality Monitor & Anomaly Detection
+  description: AI-powered data quality monitoring using statistical analysis, anomaly
+    detection, and business rule validation. Generates quality scorecards and alerts.
+  position:
+    x: 6840.0
+    y: 227.0
+  config: {}
+  agent_id: data_insights_agent
+  agent_instructions: "Analyze the transformed data for quality issues and anomalies:\n\
+    1. **Data Freshness Check**: Verify latest records are within expected time window\
+    \ (< 2 hours from ingestion)\n2. **Completeness Check**: Validate null rates per\
+    \ column are within thresholds (< 5% for critical fields)\n3. **Volume Anomalies**:\
+    \ Detect unusual transaction volumes using statistical analysis (Z-score > 3 =\
+    \ alert)\n4. **Distribution Anomalies**: Check for unexpected value distributions\
+    \ in payment amounts, statuses\n5. **Referential Integrity**: Verify foreign key\
+    \ relationships (customers\u2192transactions, etc.)\n6. **Schema Drift**: Detect\
+    \ unexpected new columns or data type changes\n7. **Duplicate Detection**: Identify\
+    \ duplicate records across all fact tables\n8. **Outlier Detection**: Flag extreme\
+    \ values (transactions > 99.5th percentile)\nGenerate quality report with severity\
+    \ levels (CRITICAL, WARNING, INFO). Return metrics: records_checked, anomalies_found,\
+    \ quality_score (0-100)."
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: dbt_000c725e
+  node_type: pipeline
+  label: 'dbt: Marts Layer (mart_*)'
+  description: 'Final layer: business-ready aggregations, KPIs, metrics. Optimized
+    for BI/analytics consumption with pre-calculated measures.'
+  position:
+    x: 5720.0
+    y: 227.0
+  config:
+    full_refresh: false
+    models:
+    - mart_payments_analytics
+    - mart_customer_metrics
+    - mart_transaction_summary
+    project_name: payments_model
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_model_1765342439
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_835d23bf
+  node_type: pipeline
+  label: 'dbt: Dimensions Layer (dim_*)'
+  description: 'Second layer: slowly changing dimensions (SCD Type 2), surrogate keys,
+    deduplication. Handles temporal validity and dimension versioning.'
+  position:
+    x: 4600.0
+    y: 227.0
+  config:
+    full_refresh: false
+    models:
+    - dim_customers
+    - dim_payment_methods
+    - dim_mandates
+    project_name: payments_model
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_model_1765342439
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_8510b06d
+  node_type: pipeline
+  label: 'dbt: Staging Layer (stg_*)'
+  description: 'First transformation layer: cleansing, standardization, null handling,
+    type casting. Applies data quality tests and documentation. Runs in dependency
+    order.'
+  position:
+    x: 3480.0
+    y: 227.0
+  config:
+    full_refresh: false
+    models:
+    - stg_customers
+    - stg_transactions
+    - stg_payment_methods
+    - stg_mandates
+    - stg_payouts
+    - stg_refunds
+    - stg_disputes
+    - stg_fees
+    - stg_transaction_legs
+    project_name: payments_model
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_model_1765342439
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_c0ba3f6c
+  node_type: agent
+  label: Schema Evolution Handler & Auto-Fix
+  description: Detects schema evolution issues from source, validates against dbt
+    models, and auto-fixes or escalates to Slack
+  position:
+    x: 1800.0
+    y: 227.0
+  config: {}
+  agent_id: dbt_agent
+  agent_instructions: "Advanced schema evolution detection and auto-remediation system:\n\
+    \n**SCHEMA EVOLUTION DETECTION PHASE:**\n1. **Source Schema Analysis:**\n   -\
+    \ Compare current PostgreSQL payments_v1 schema against last known state\n   -\
+    \ Detect: new columns, dropped columns, type changes, constraint changes\n   -\
+    \ Identify: column renames, reordering, default value changes\n\n2. **Airbyte\
+    \ Connector Validation:**\n   - Check Airbyte connector configuration against\
+    \ source schema\n   - Validate field mappings are up-to-date\n   - Detect: unmapped\
+    \ new columns, broken mappings\n\n3. **BigQuery Schema Validation:**\n   - Compare\
+    \ BigQuery table schemas against source\n   - Detect schema drift in destination\n\
+    \   - Identify: missing columns, type mismatches\n\n4. **dbt Model Alignment:**\n\
+    \   - Validate dbt models reference existing columns\n   - Check for broken column\
+    \ references in staging layer\n   - Identify: orphaned columns in transformations\n\
+    \n**AUTO-REMEDIATION STRATEGIES:**\n\n**TIER 1 - SAFE AUTO-FIX (Execute Immediately):**\n\
+    1. **Additive Changes (New Columns):**\n   - Auto-add new columns to staging models\
+    \ (stg_* tables)\n   - Set appropriate data types based on source\n   - Add null\
+    \ handling if column is optional\n   - Auto-generate dbt documentation for new\
+    \ columns\n\n2. **Column Renames:**\n   - Update dbt models with new column names\n\
+    \   - Maintain backward compatibility with aliases\n   - Update downstream fact/mart\
+    \ references\n\n3. **Type Coercion (Safe):**\n   - Auto-cast compatible types\
+    \ (int\u2192bigint, varchar\u2192string)\n   - Add explicit type casting in dbt\
+    \ models\n   - Log type changes for audit trail\n\n**TIER 2 - VALIDATION REQUIRED\
+    \ (Notify & Wait):**\n1. **Destructive Changes (Dropped Columns):**\n   - Flag\
+    \ columns being dropped from source\n   - Check if columns used in downstream\
+    \ models\n   - If used: require manual approval before removal\n   - If unused:\
+    \ auto-remove from dbt models\n\n2. **Type Incompatibilities:**\n   - Flag incompatible\
+    \ type changes (string\u2192int without safe conversion)\n   - Suggest conversion\
+    \ functions\n   - Require manual validation\n\n**TIER 3 - ESCALATION (Slack Alert\
+    \ Required):**\n1. **Breaking Changes:**\n   - Primary key changes\n   - Unique\
+    \ constraint removals\n   - Critical column drops\n   - Major type incompatibilities\n\
+    \n2. **Complex Scenarios:**\n   - Multiple simultaneous schema changes\n   - Changes\
+    \ affecting multiple tables\n   - Ambiguous column renames\n\n**EXECUTION FLOW:**\n\
+    1. Execute all TIER 1 auto-fixes\n2. For TIER 2: notify #data-pipeline Slack channel,\
+    \ wait for approval (timeout: 30 min)\n3. For TIER 3: immediately escalate to\
+    \ #data-incidents with detailed analysis\n\n**SLACK NOTIFICATIONS:**\n- **AUTO-FIX\
+    \ SUCCESS:** \"\u2705 Schema Evolution Auto-Fixed: Added 3 new columns to transactions\
+    \ table. Updated dbt staging models. Quality check: PASSED\"\n- **MANUAL APPROVAL\
+    \ NEEDED:** \"\u26A0\uFE0F Schema Change Requires Approval: Dropped column 'legacy_field'\
+    \ detected. Used in 2 downstream models. Approve removal? [Yes/No]\"\n- **CRITICAL\
+    \ ESCALATION:** \"\U0001F6A8 CRITICAL Schema Evolution Issue: Primary key change\
+    \ detected in customers table. Manual intervention required. <link to full analysis>\"\
+    \n\n**ROLLBACK CAPABILITY:**\n- Create snapshot of dbt models before changes\n\
+    - Maintain schema change history in metadata table\n- Enable rollback to previous\
+    \ schema version if needed\n\n**AUDIT & DOCUMENTATION:**\n- Log all schema changes\
+    \ to schema_evolution_log table\n- Document auto-fixes applied and their impact\n\
+    - Generate schema change report for data governance team\n\nReturn: {schema_changes_detected,\
+    \ auto_fixes_applied, manual_approvals_needed, critical_issues, slack_notifications_sent,\
+    \ quality_check_passed}"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: notification_slack_c95bec0b
+  node_type: notification
+  label: 'Slack: Schema Evolution Alert'
+  description: "\U0001F4AC Send slack notification"
+  position:
+    x: 2920.0
+    y: 136.0
+  config:
+    channel_type: slack
+    include_previous_output: true
+    message: "\U0001F504 **Schema Evolution Detected & Handled**\n\n**Changes Detected:**\
+      \ {{previous_output}}\n\n**Auto-Fixes Applied:**\n- New columns added to staging\
+      \ models\n- dbt models updated\n- Type coercions applied\n\n**Quality Check:**\
+      \ PASSED \u2705\n\n**Action Required:** None - Auto-remediation successful\n\
+      \n**Timestamp:** {{timestamp}}\n\nFor detailed analysis, check the workflow\
+      \ run logs."
+    recipients: ''
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0

@@ -1,0 +1,19 @@
+name: Table Access Pattern Analyzer & Optimization Engine
+description: Automated agentic workflow using Super Agent to analyze table access
+  patterns, identify optimization opportunities (materialized views, partitioning,
+  clustering), generate implementation plans, and provide executive summaries. Runs
+  daily at 2 AM UTC.
+version: 1.0.0
+status: paused
+tags:
+- database-optimization
+- performance
+- agentic-flow
+- super-agent
+- analytics
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

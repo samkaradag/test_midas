@@ -1,0 +1,7 @@
+- name: 'Trigger: Schedule Daily Analysis'
+  description: Auto-generated schedule for trigger node trigger_7c1a1225
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

@@ -1,0 +1,19 @@
+name: Daily Disputes Report - DBT + Email
+description: Daily workflow that refreshes the rpt_open_disputes_daily DBT model every
+  weekday at 8 AM, then sends email reports. Includes error handling with retry logic
+  and notifications.
+version: 1.0.0
+status: paused
+tags:
+- daily
+- disputes
+- dbt
+- email-report
+- weekday
+- production
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

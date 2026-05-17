@@ -1,0 +1,203 @@
+- node_id: dbt_68b9aba0
+  node_type: pipeline
+  label: Run test_midas dbt Pipeline
+  description: Transform data using test_midas dbt models
+  position:
+    x: 1780.0
+    y: 405.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: null
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_test_midas_1771132375
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: ingestion_ed31746d
+  node_type: pipeline
+  label: PostgreSQL to BigQuery Ingestion
+  description: Extract data from PostgreSQL and load to BigQuery
+  position:
+    x: 1220.0
+    y: 290.0
+  config:
+    destination_connection_id: null
+    source_connection_id: null
+    sync_mode: full_refresh
+    tables: []
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: b7807895-a4d7-43bf-8ad6-054759dd976c
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: notification_slack_8e6e2be9
+  node_type: notification
+  label: Slack Notification - Error & Fix
+  description: Notifies team of pipeline failure and fix PR
+  position:
+    x: 3420.0
+    y: 405.0
+  config:
+    channel_type: slack
+    include_previous_output: true
+    message: "\U0001F6A8 **Pipeline Failure Alert**\\n\\n**Workflow**: {{workflow_name}}\\\
+      n**Status**: Failed\\n**Node**: {{node_name}}\\n\\n**Action Taken**: dbt Error\
+      \ Analysis Agent has created a fix branch and submitted a pull request.\\n\\\
+      n**Details**:\\n{{previous_output}}\\n\\n**Timestamp**: {{timestamp}}"
+    recipients: ''
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: trigger_b07be640
+  node_type: trigger
+  label: Daily Trigger
+  description: Runs daily at 2 AM UTC
+  position:
+    x: 120.0
+    y: 318.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: pipeline_1776179718403
+  node_type: pipeline
+  label: accounts_data_model
+  description: 'data_model pipeline: accounts_data_model'
+  position:
+    x: 120.0
+    y: 120.0
+  config:
+    on_failure: fail
+    run_mode: full_refresh
+    timeout_minutes: 60
+    wait_for_completion: true
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: data_model_accounts_data_model_1771555685
+  pipeline_type: data_model
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: agent_1776179720868
+  node_type: agent
+  label: Super Agent
+  description: AI agent for Super Agent tasks
+  position:
+    x: 120.0
+    y: 492.0
+  config: {}
+  agent_id: agent_team
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_1776179769052
+  node_type: agent
+  label: Super Agent
+  description: AI agent for Super Agent tasks
+  position:
+    x: 120.0
+    y: 690.0
+  config: {}
+  agent_id: agent_team
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: condition_9c314bd1
+  node_type: condition
+  label: Account Data Model Status Check
+  description: Check if accounts_data_model executed successfully
+  position:
+    x: 660.0
+    y: 409.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: status == 'success'
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_310bbb29
+  node_type: agent
+  label: Account Data Model Troubleshooting
+  description: Super agent for troubleshooting accounts_data_model failures
+  position:
+    x: 1220.0
+    y: 504.0
+  config: {}
+  agent_id: agent_team
+  agent_instructions: Analyze the failed accounts_data_model pipeline execution. Identify
+    root causes by examining error logs, data quality issues, schema mismatches, or
+    connection problems. Propose fixes and create a remediation plan. If possible,
+    implement fixes and re-run the pipeline.
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_87fe1fa9
+  node_type: agent
+  label: dbt Error Analysis & Fix Agent
+  description: Analyzes dbt failures, creates fix branch, and submits PR
+  position:
+    x: 2860.0
+    y: 397.0
+  config: {}
+  agent_id: dbt
+  agent_instructions: Analyze the failed dbt pipeline execution. Identify the root
+    cause of the failure by examining error logs and dbt compilation issues. Fix the
+    issues. commit and push.
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: condition_2f9ec55a
+  node_type: condition
+  label: Pipeline Status Check
+  description: Check if dbt pipeline executed successfully
+  position:
+    x: 2320.0
+    y: 417.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: status == 'success'
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

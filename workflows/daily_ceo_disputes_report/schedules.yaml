@@ -1,0 +1,14 @@
+- name: 'Trigger: Daily Schedule - 6:00 AM UTC'
+  description: Auto-generated schedule for trigger node trigger_a23afb4f
+  schedule_type: cron
+  cron_expression: 0 6 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: Daily 6:00 AM UTC
+  description: Runs the CEO disputes report workflow daily at 6:00 AM UTC
+  schedule_type: cron
+  cron_expression: 0 6 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

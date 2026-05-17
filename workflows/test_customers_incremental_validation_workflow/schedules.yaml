@@ -1,0 +1,14 @@
+- name: 'Trigger: Schedule Trigger - Every 5 Minutes'
+  description: Auto-generated schedule for trigger node trigger_4c54e033
+  schedule_type: cron
+  cron_expression: '*/5 * * * *'
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: 'Trigger: TEST: Customers Incremental Validation Workflow'
+  description: Every 5 minutes
+  schedule_type: cron
+  cron_expression: '*/5 * * * *'
+  timezone: UTC
+  interval_minutes: null
+  is_active: false

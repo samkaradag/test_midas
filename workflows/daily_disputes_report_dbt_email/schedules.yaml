@@ -1,0 +1,14 @@
+- name: Weekday 8 AM Schedule
+  description: Runs every weekday (Monday-Friday) at 8:00 AM UTC
+  schedule_type: cron
+  cron_expression: 0 8 * * 1-5
+  timezone: UTC
+  interval_minutes: null
+  is_active: true
+- name: 'Trigger: Weekday 8 AM Trigger'
+  description: Auto-generated schedule for trigger node trigger_8dace9f1
+  schedule_type: cron
+  cron_expression: 0 8 * * 1-5
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

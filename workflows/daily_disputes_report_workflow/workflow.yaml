@@ -1,0 +1,18 @@
+name: daily_disputes_report_workflow
+description: Production-ready daily disputes report workflow that refreshes the rpt_daily_open_disputes
+  model, generates and sends email reports, and logs execution status with comprehensive
+  error handling and retry logic.
+version: 1.0.0
+status: paused
+tags:
+- disputes
+- reporting
+- daily
+- production
+- email
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

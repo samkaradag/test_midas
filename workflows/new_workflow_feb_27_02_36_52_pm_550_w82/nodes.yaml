@@ -1,0 +1,23 @@
+- node_id: notification_slack_1772231821683
+  node_type: notification
+  label: Slack Notification
+  description: Send a Slack message or channel notification
+  position:
+    x: 120.0
+    y: 120.0
+  config:
+    channel_type: slack
+    recipients: ''
+    subject: ''
+    message_template: ''
+    include_previous_output: true
+    webhook_url: ''
+    webhook_method: POST
+    webhook_headers: {}
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0

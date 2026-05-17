@@ -1,0 +1,15 @@
+- edge_id: edge_1b2705d0
+  source_node_id: spark_0bfa7800
+  target_node_id: notification_slack_07c18900
+  label: on_success
+  condition: success
+- edge_id: edge_5a5ceee6
+  source_node_id: trigger_67df8adf
+  target_node_id: spark_0bfa7800
+  label: Start Ingestion
+  condition: null
+- edge_id: edge_4ec2c0da
+  source_node_id: spark_0bfa7800
+  target_node_id: notification_slack_f902ce35
+  label: on_failure
+  condition: failure

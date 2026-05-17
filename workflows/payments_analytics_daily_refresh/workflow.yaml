@@ -1,0 +1,17 @@
+name: Payments Analytics Daily Refresh
+description: "Daily orchestration of payments data pipeline: PostgreSQL CDC ingestion\
+  \ \u2192 dbt star schema transformations \u2192 data quality validation"
+version: 1.0.0
+status: active
+tags:
+- payments
+- analytics
+- star-schema
+- daily
+- production
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

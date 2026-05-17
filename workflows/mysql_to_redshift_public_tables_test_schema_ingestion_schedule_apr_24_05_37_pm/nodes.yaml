@@ -1,0 +1,37 @@
+- node_id: trigger_1
+  node_type: trigger
+  label: Schedule Trigger
+  description: ''
+  position:
+    x: 100.0
+    y: 100.0
+  config:
+    type: schedule
+    expression: 0 2 * * *
+    timezone: UTC
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: ingestion_1
+  node_type: pipeline
+  label: MySQL to Redshift - Public Tables (Test Schema)
+  description: ''
+  position:
+    x: 500.0
+    y: 100.0
+  config:
+    run_mode: full_refresh
+    wait_for_completion: true
+    timeout_minutes: 120
+    on_failure: fail
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: 962586ac-ae8d-450b-9992-da40b5300bd2
+  pipeline_type: airbyte
+  timeout_minutes: 30
+  retry_count: 0

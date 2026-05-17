@@ -1,0 +1,145 @@
+- node_id: agent_07569bd0
+  node_type: agent
+  label: PII Detection & Validation
+  description: Validates that analyzed tables contain no unencrypted PII and ensures
+    compliance
+  position:
+    x: 1240.0
+    y: 334.0
+  config: {}
+  agent_id: super_agent
+  agent_instructions: 'Scan the analyzed tables for any Personally Identifiable Information
+    (PII) and ensure compliance:\n\nCheck for common PII patterns:\n1. EMAIL ADDRESSES:
+    Columns containing @domain patterns\n2. PHONE NUMBERS: 10-digit or international
+    formats\n3. SOCIAL SECURITY NUMBERS: 9-digit patterns (XXX-XX-XXXX)\n4. CREDIT
+    CARD NUMBERS: 16-digit patterns\n5. NAMES: First/last name columns with personal
+    identifiers\n6. ADDRESSES: Street, city, postal codes\n7. DATE OF BIRTH: Birth
+    date columns\n8. PASSPORT/ID NUMBERS: Government ID patterns\n9. ENCRYPTED/HASHED
+    DATA: Verify if sensitive data is properly encrypted\n10. COLUMN NAMING PATTERNS:
+    Review column names for PII indicators\n\nFor each table analyzed:\n- Flag any
+    columns that appear to contain PII\n- Check data classification and encryption
+    status\n- Verify compliance with data privacy regulations (GDPR, CCPA, HIPAA)\n-
+    Recommend data masking or encryption if needed\n\nOutput:\n- List of tables with
+    NO PII detected (safe to optimize)\n- List of tables WITH PII detected (require
+    additional safeguards)\n- Recommendations for PII handling during optimization\n-
+    Compliance status and risk assessment\n\nIf PII is detected, flag as HIGH PRIORITY
+    for data governance review before proceeding with optimizations.'
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_40cef3cf
+  node_type: agent
+  label: Analyze Table Access Patterns
+  description: Super agent analyzes table access patterns from database metrics
+  position:
+    x: 680.0
+    y: 227.0
+  config: {}
+  agent_id: super_agent
+  agent_instructions: "Analyze table access patterns from the database query logs\
+    \ and metrics. \n\nFor each table, identify:\n1. Query frequency (number of queries\
+    \ accessing the table)\n2. Most common filter columns (WHERE clause analysis)\n\
+    3. Most frequently joined columns\n4. Average query execution time\n5. Total data\
+    \ scanned\n6. Peak access hours/patterns\n\nFocus on the top 10 most accessed\
+    \ tables. Output a detailed JSON report with table names, access frequency, and\
+    \ key access patterns."
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_7bc498f3
+  node_type: agent
+  label: Generate Implementation Plan
+  description: Super agent creates detailed implementation roadmap
+  position:
+    x: 1800.0
+    y: 227.0
+  config: {}
+  agent_id: super_agent
+  agent_instructions: "Create a detailed implementation plan for the recommended optimizations:\n\
+    \n1. PHASE 1 - High Priority (Expected ROI > 40%):\n   - List specific DDL statements\
+    \ for partitioning\n   - Materialized view creation scripts\n   - Clustering configuration\
+    \ commands\n   - Migration strategy (zero-downtime if possible)\n   - Estimated\
+    \ execution time\n\n2. PHASE 2 - Medium Priority (Expected ROI 20-40%):\n   -\
+    \ Secondary optimizations\n   - Index creation recommendations\n   - View materialization\
+    \ strategy\n\n3. PHASE 3 - Low Priority (Expected ROI < 20%):\n   - Nice-to-have\
+    \ optimizations\n   - Maintenance considerations\n\nFor each optimization:\n-\
+    \ Provide exact SQL/configuration syntax\n- List prerequisites and dependencies\n\
+    - Specify rollback procedure\n- Include performance testing checklist\n- Document\
+    \ monitoring metrics to track improvements\n\nOutput a step-by-step implementation\
+    \ guide that can be executed by the data engineering team."
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_89859356
+  node_type: agent
+  label: Identify Optimization Opportunities
+  description: Super agent recommends specific optimization strategies
+  position:
+    x: 1240.0
+    y: 120.0
+  config: {}
+  agent_id: super_agent
+  agent_instructions: "Based on the table access patterns provided, identify optimization\
+    \ opportunities:\n\nFor each highly accessed table, recommend:\n1. PARTITIONING\
+    \ strategy:\n   - Partition key: The column most frequently used in WHERE clauses\n\
+    \   - Partition type: RANGE, LIST, or HASH based on data distribution\n   - Expected\
+    \ performance gain: Query reduction percentage\n\n2. CLUSTERING strategy:\n  \
+    \ - Cluster key columns: The columns most frequently used in joins and filters\n\
+    \   - Sort order optimization\n   - Expected I/O reduction percentage\n\n3. MATERIALIZED\
+    \ VIEWS:\n   - For complex queries that access multiple tables\n   - Pre-aggregated\
+    \ views for common reporting queries\n   - Incremental refresh strategy\n\nPrioritize\
+    \ recommendations by:\n- Query frequency impact\n- Expected performance improvement\n\
+    - Implementation complexity\n- Storage overhead\n\nOutput a comprehensive optimization\
+    \ plan with specific DDL recommendations and expected benefits."
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: agent_8edbf9db
+  node_type: agent
+  label: Generate Executive Summary Report
+  description: Super agent creates executive summary for stakeholders
+  position:
+    x: 2360.0
+    y: 226.0
+  config: {}
+  agent_id: super_agent
+  agent_instructions: "Create an executive summary report of the analysis and recommendations:\n\
+    \nInclude:\n1. EXECUTIVE SUMMARY:\n   - Key findings on table access patterns\n\
+    \   - Current performance bottlenecks\n   - Recommended optimizations (top 3)\n\
+    \n2. BUSINESS IMPACT:\n   - Estimated query performance improvement (%)\n   -\
+    \ Expected reduction in execution time\n   - Estimated storage overhead\n   -\
+    \ Cost savings potential\n\n3. TECHNICAL SUMMARY:\n   - Tables analyzed\n   -\
+    \ Optimization strategies recommended\n   - Implementation timeline (weeks)\n\
+    \   - Risk assessment\n\n4. NEXT STEPS:\n   - Immediate actions\n   - Review and\
+    \ approval process\n   - Implementation schedule\n\nFormat as a professional report\
+    \ suitable for stakeholder review with clear metrics and ROI justification."
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: trigger_7c1a1225
+  node_type: trigger
+  label: Schedule Daily Analysis
+  description: Trigger table access pattern analysis daily at 2 AM
+  position:
+    x: 120.0
+    y: 239.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

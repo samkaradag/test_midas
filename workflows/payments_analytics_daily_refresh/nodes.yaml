@@ -1,0 +1,287 @@
+- node_id: notification_email_95ba0121
+  node_type: notification
+  label: Quality Alert - Data Issues
+  description: Sends detailed alert when data quality verification fails, including
+    violations and remediation recommendations
+  position:
+    x: 2900.0
+    y: 120.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: "\u26A0\uFE0F **Data Quality Verification FAILED** for Payments Analytics\
+      \ Daily Refresh\n\n**Quality Score:** {{previous_output.quality_score}}%\n**Rules\
+      \ Failed:** {{previous_output.rules_failed}} / 8\n\n**Violations:**\n{{previous_output.violations_summary}}\n\
+      \n**Recommended Actions:**\n{{previous_output.recommendations}}\n\n**Timestamp:**\
+      \ {{timestamp}}\n\n\U0001F527 **Next Steps:**\n1. Review the violations above\n\
+      2. Check source data freshness\n3. Verify dbt model logic\n4. Run dbt tests\
+      \ manually: `dbt test -s payments_medallion`\n5. Contact data team for escalation\n\
+      \n**Workflow:** {{workflow_name}}\n**Status:** {{status}}"
+    recipients: data-team@company.com
+    subject: "\U0001F6A8 Payments Analytics - Data Quality Verification Failed"
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: agent_7f9814e3
+  node_type: agent
+  label: dbt Auto-Fix Super Agent
+  description: Automatically analyzes dbt errors and applies fixes for common issues
+  position:
+    x: 1780.0
+    y: 334.0
+  config: {}
+  agent_id: super_agent
+  agent_instructions: "You are the dbt Auto-Fix Super Agent for the Payments Analytics\
+    \ pipeline.\n\n**MISSION**: Automatically diagnose and fix dbt errors in the payments_medallion\
+    \ pipeline.\n\n**WORKFLOW**:\n1. **Error Analysis**: Analyze the dbt error from\
+    \ the previous step\n   - Parse error logs to identify: compilation errors, SQL\
+    \ syntax issues, schema mismatches, missing columns, reference errors, test failures\n\
+    \   - Determine root cause and affected models\n\n2. **Auto-Fix Strategy**:\n\
+    \   - **Syntax Errors**: Fix SQL syntax, Jinja templating issues, missing commas/parentheses\n\
+    \   - **Schema Mismatches**: Update column references, add missing columns, fix\
+    \ data types\n   - **Reference Errors**: Correct source/ref() calls, fix model\
+    \ dependencies\n   - **Test Failures**: Adjust test thresholds or fix data quality\
+    \ issues in models\n   - **Missing Dependencies**: Add missing CTEs, update model\
+    \ configs\n\n3. **Implementation**:\n   - Read affected dbt model files using\
+    \ dbt agent tools\n   - Apply fixes to the SQL/YAML files\n   - Write corrected\
+    \ files back\n   - Create a git commit with descriptive message (e.g., \"fix:\
+    \ resolve schema mismatch in fct_payments\")\n\n4. **Validation**:\n   - Re-run\
+    \ the dbt pipeline with the fixes\n   - If still failing after 2 attempts, escalate\
+    \ to human review\n\n5. **Reporting**:\n   - Return a summary: error type, fix\
+    \ applied, files modified, git commit hash\n   - Include re-run status\n\n**CONTEXT**:\n\
+    - Pipeline: dbt_payments_medallion_1776182676\n- Models: staging \u2192 dimensions\
+    \ (customers, merchants, payment_methods, etc.) \u2192 fact_payments\n- Common\
+    \ issues: column name mismatches, schema evolution, test threshold violations\n\
+    \n**OUTPUT FORMAT**:\n```\n\u2705 dbt Auto-Fix Complete\n\nError Type: [error\
+    \ category]\nRoot Cause: [detailed cause]\n\nFixes Applied:\n- [file1]: [change\
+    \ description]\n- [file2]: [change description]\n\nGit Commit: [commit hash]\n\
+    Re-run Status: [SUCCESS/FAILED]\n\n[If failed again: Escalation required - human\
+    \ review needed]\n```"
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: dbt_825149d5
+  node_type: pipeline
+  label: Build Star Schema (dbt)
+  description: "Run dbt models: staging \u2192 dimensions (SCD Type 2) \u2192 fact\
+    \ table"
+  position:
+    x: 1220.0
+    y: 227.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: null
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_payments_medallion_1776182676
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: ingestion_80df67cf
+  node_type: pipeline
+  label: Sync PostgreSQL Payments (CDC)
+  description: Incremental CDC sync of 9 payments tables from PostgreSQL to BigQuery
+  position:
+    x: 660.0
+    y: 227.0
+  config:
+    destination_connection_id: null
+    source_connection_id: null
+    sync_mode: cdc
+    tables: []
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: a8ca65b5-673d-488d-ac7f-6334ec052f84
+  pipeline_type: airbyte_ingestion
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: notification_email_00fecb82
+  node_type: notification
+  label: Notify Success
+  description: Email notification on successful completion
+  position:
+    x: 2900.0
+    y: 334.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: "\u2705 Payments Analytics Pipeline Completed Successfully\n\nWorkflow:\
+      \ {{workflow_name}}\nStatus: {{status}}\nTimestamp: {{timestamp}}\n\nSummary:\n\
+      - PostgreSQL CDC sync completed\n- dbt star schema models refreshed (1 fact\
+      \ + 5 dimensions)\n- All data quality tests passed\n\nPrevious Step Output:\n\
+      {{previous_output}}"
+    recipients: data-team@company.com
+    subject: "\u2705 Payments Analytics Daily Refresh - Success"
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: notification_email_62c8ebad
+  node_type: notification
+  label: Notify Failure
+  description: Email notification on pipeline failure
+  position:
+    x: 2340.0
+    y: 322.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: "\u274C Payments Analytics Pipeline Failed\n\nWorkflow: {{workflow_name}}\n\
+      Status: {{status}}\nFailed Step: {{node_name}}\nTimestamp: {{timestamp}}\n\n\
+      Error Details:\n{{previous_output}}\n\nAction Required: Please investigate and\
+      \ resolve the issue."
+    recipients: data-team@company.com
+    subject: "\u274C Payments Analytics Daily Refresh - FAILURE"
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: trigger_651c4175
+  node_type: trigger
+  label: Daily Schedule Trigger
+  description: Triggers daily at 2:00 AM UTC
+  position:
+    x: 120.0
+    y: 247.0
+  config:
+    expression: 0 2 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: agent_70e5e325
+  node_type: agent
+  label: Data Quality Verification
+  description: 'Validates all data quality rules after dbt star schema transformations:
+    PK integrity, FK referential integrity, row count thresholds, freshness, NULL
+    checks, distribution anomalies, cardinality, and amount validation. Returns quality
+    score and violation details.'
+  position:
+    x: 1780.0
+    y: 120.0
+  config: {}
+  agent_id: data_quality_super_agent
+  agent_instructions: "You are a Data Quality Verification Super Agent for the Payments\
+    \ Analytics star schema.\n\nROLE: Validate all data quality rules after dbt transformations\
+    \ complete.\n\nDATA QUALITY RULES TO VERIFY:\n\n1. **PRIMARY KEY INTEGRITY**\n\
+    \   - Check for NULL values in: dim_customers.customer_id, dim_products.product_id,\
+    \ dim_dates.date_id, dim_payment_methods.method_id, fct_payments.payment_id\n\
+    \   - Verify no duplicate primary keys exist\n   - Return: {rule: 'pk_integrity',\
+    \ status: 'pass'|'fail', violations: count, details: []}\n\n2. **FOREIGN KEY REFERENTIAL\
+    \ INTEGRITY**\n   - fct_payments.customer_id \u2192 dim_customers.customer_id\n\
+    \   - fct_payments.product_id \u2192 dim_products.product_id\n   - fct_payments.date_id\
+    \ \u2192 dim_dates.date_id\n   - fct_payments.payment_method_id \u2192 dim_payment_methods.method_id\n\
+    \   - Return: {rule: 'fk_integrity', status: 'pass'|'fail', orphaned_records:\
+    \ count}\n\n3. **ROW COUNT THRESHOLDS**\n   - fct_payments: Should have \u2265\
+    \ 95% of previous day (allow 5% variance)\n   - Each dimension: Should have \u2265\
+    \ 90% of previous day\n   - Return: {rule: 'row_count', status: 'pass'|'fail',\
+    \ variance_percent: float, details: []}\n\n4. **DATA FRESHNESS**\n   - fct_payments:\
+    \ Latest payment_date should be \u2264 1 day old\n   - All timestamps should be\
+    \ within last 48 hours\n   - Return: {rule: 'freshness', status: 'pass'|'fail',\
+    \ max_age_hours: float}\n\n5. **NULL VALUE CHECKS**\n   - fct_payments: amount,\
+    \ currency, status must be NOT NULL (100% populated)\n   - dim_customers: customer_name\
+    \ must be NOT NULL\n   - Return: {rule: 'null_values', status: 'pass'|'fail',\
+    \ null_columns: []}\n\n6. **DISTRIBUTION ANOMALIES**\n   - fct_payments.status:\
+    \ Validate distribution (% cancelled, failed, completed)\n   - Alert if any status\
+    \ represents >80% of transactions (potential data issue)\n   - Return: {rule:\
+    \ 'distribution', status: 'pass'|'fail', anomalies: []}\n\n7. **CARDINALITY CHECKS**\n\
+    \   - dim_customers: 100 \u2264 count \u2264 100,000\n   - dim_products: 10 \u2264\
+    \ count \u2264 50,000\n   - dim_payment_methods: 2 \u2264 count \u2264 100\n \
+    \  - Return: {rule: 'cardinality', status: 'pass'|'fail', details: []}\n\n8. **AMOUNT\
+    \ VALIDATION**\n   - fct_payments.amount: All values > 0\n   - No extreme outliers\
+    \ (> 10x median)\n   - Return: {rule: 'amount_validation', status: 'pass'|'fail',\
+    \ violations: count}\n\nEXECUTION WORKFLOW:\n1. Query the dbt-generated tables\
+    \ (dim_* and fct_payments)\n2. Run each validation rule sequentially\n3. Collect\
+    \ results: pass_count, fail_count, violation_details\n4. Generate summary report\
+    \ with:\n   - Overall quality_score (0-100%)\n   - Pass/fail breakdown by rule\n\
+    \   - Specific violations with record counts\n   - Root cause hypotheses\n   -\
+    \ Remediation recommendations\n\nOUTPUT FORMAT (JSON):\n{\n  \"quality_score\"\
+    : 95.5,\n  \"overall_status\": \"pass\"|\"fail\",\n  \"rules_passed\": 8,\n  \"\
+    rules_failed\": 0,\n  \"validation_results\": [\n    {\n      \"rule\": \"rule_name\"\
+    ,\n      \"status\": \"pass\"|\"fail\",\n      \"details\": {...}\n    }\n  ],\n\
+    \  \"violations_summary\": \"All 8 quality rules passed. Data ready for analytics.\"\
+    ,\n  \"recommendations\": [],\n  \"timestamp\": \"2026-05-08T02:30:00Z\"\n}\n\n\
+    QUALITY THRESHOLDS:\n- \u2705 PASS: All rules pass OR quality_score \u2265 95%\n\
+    - \u26A0\uFE0F  WARNING: 80% \u2264 quality_score < 95% (log issues, continue)\n\
+    - \u274C FAIL: quality_score < 80% (halt pipeline, escalate)\n\nIf any rule fails,\
+    \ provide specific violations, affected record counts, and recommended fixes."
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: condition_0b3ea10c
+  node_type: condition
+  label: Quality Check Result
+  description: "Branch on data quality verification outcome: pass (\u226595% quality_score)\
+    \ or fail"
+  position:
+    x: 2340.0
+    y: 132.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: overall_status == 'pass' and quality_score >= 95
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: spark_871f7124
+  node_type: pipeline
+  label: Post-Transform Analytics Job
+  description: 'Executes post-dbt transformation analytics: generates disputes reports,
+    aggregates KPIs, and prepares analytics outputs'
+  position:
+    x: 3250.0
+    y: 200.0
+  config:
+    script_path: disputes_report_generator.py
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '1'
+        memory: 2Gi
+      timeout_minutes: 60
+    spark_config: {}
+    is_notebook: false
+    script_name: disputes_report_generator.py
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: test_midas
+  pipeline_type: spark
+  timeout_minutes: 60
+  retry_count: 0

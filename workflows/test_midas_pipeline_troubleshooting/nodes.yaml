@@ -1,0 +1,76 @@
+- node_id: agent_325fb35f
+  node_type: agent
+  label: Error Analysis Agent
+  description: Analyzes pipeline errors and identifies root causes
+  position:
+    x: 1780.0
+    y: 120.0
+  config: {}
+  agent_id: dbt
+  agent_instructions: 'Analyze the failed test_midas pipeline execution. Extract error
+    messages, stack traces, and failure reasons. Identify the root cause categories:
+    schema issues, data quality problems, dependency failures, SQL errors, or configuration
+    issues. Provide detailed analysis with specific error locations and affected models.
+    Create a new branch from main, apply fixes in that branch and then create a pull
+    request. DO NOT ASK QUESTIONS DISCOVER THE PIPELINES YOURSELF AND FIND THE CORRECT
+    TEST_MIDAS PIPELINE AND EXECUTE EVERYTHING WITHOUT WAITIN USER INPUT!'
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: condition_01373361
+  node_type: condition
+  label: Pipeline Status Check
+  description: Branch workflow based on pipeline execution status
+  position:
+    x: 1220.0
+    y: 132.0
+  config:
+    branches:
+      'false': null
+      'true': null
+    expression: status == 'success'
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_b5fdc57f
+  node_type: pipeline
+  label: Run test_midas Pipeline
+  description: Execute test_midas dbt pipeline
+  position:
+    x: 680.0
+    y: 128.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: test_midas
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_test_midas_1771132375
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: trigger_36c0fe47
+  node_type: trigger
+  label: Start Pipeline Troubleshooting
+  description: Manually trigger the test_midas pipeline troubleshooting workflow
+  position:
+    x: 120.0
+    y: 132.0
+  config:
+    expression: null
+    type: manual
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

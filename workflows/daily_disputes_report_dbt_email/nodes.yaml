@@ -1,0 +1,195 @@
+- node_id: dbt_313737ee
+  node_type: pipeline
+  label: Build Mart Model - mart_open_disputes_daily
+  description: Builds the mart_open_disputes_daily model for business analytics
+  position:
+    x: 1240.0
+    y: 211.0
+  config:
+    full_refresh: false
+    models:
+    - mart_open_disputes_daily
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_ba4f6557
+  node_type: pipeline
+  label: Refresh DBT Model - rpt_open_disputes_daily
+  description: Runs the rpt_open_disputes_daily DBT model to refresh daily dispute
+    reports
+  position:
+    x: 680.0
+    y: 211.0
+  config:
+    full_refresh: false
+    models:
+    - rpt_open_disputes_daily
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_slack_44fdcf09
+  node_type: notification
+  label: Notify Success
+  description: Sends success notification to Slack
+  position:
+    x: 4040.0
+    y: 120.0
+  config:
+    channel_type: slack
+    include_previous_output: true
+    message: "\u2705 Daily disputes report workflow completed successfully!\\n\\n**Workflow:**\
+      \ {{workflow_name}}\\n**Status:** {{status}}\\n**Timestamp:** {{timestamp}}\\\
+      n\\nThe rpt_open_disputes_daily model has been refreshed and email reports have\
+      \ been sent."
+    recipients: '#data-alerts'
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: notification_slack_550a1cf4
+  node_type: notification
+  label: Notify Failure
+  description: Sends failure notification to Slack
+  position:
+    x: 4040.0
+    y: 318.0
+  config:
+    channel_type: slack
+    include_previous_output: true
+    message: "\u274C Daily disputes report workflow FAILED!\\n\\n**Workflow:** {{workflow_name}}\\\
+      n**Status:** {{status}}\\n**Timestamp:** {{timestamp}}\\n**Last Node:** {{node_name}}\\\
+      n\\nPlease check the logs and retry manually if needed. The system will automatically\
+      \ retry up to 3 times."
+    recipients: '#data-alerts'
+    subject: ''
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: spark_07ea1f2d
+  node_type: pipeline
+  label: Send Email Report
+  description: Executes the Python email report script to send dispute reports
+  position:
+    x: 3480.0
+    y: 199.0
+  config:
+    is_notebook: false
+    runtime: dagen
+    runtime_config:
+      resources:
+        cpu: '1'
+        memory: 2Gi
+      timeout_minutes: 60
+    script_name: send_disputes_report.py
+    script_path: send_disputes_report.py
+    spark_config: {}
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: test_midas
+  pipeline_type: spark
+  timeout_minutes: 60
+  retry_count: 0
+- node_id: trigger_8dace9f1
+  node_type: trigger
+  label: Weekday 8 AM Trigger
+  description: Triggers every weekday (Mon-Fri) at 8:00 AM UTC
+  position:
+    x: 120.0
+    y: 223.0
+  config:
+    expression: 0 8 * * 1-5
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_1518d778
+  node_type: pipeline
+  label: Build Analysis - ceo_open_disputes_analysis
+  description: Generates CEO-level analysis of open disputes
+  position:
+    x: 1800.0
+    y: 219.0
+  config:
+    full_refresh: false
+    models:
+    - ceo_open_disputes_analysis
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_2f53ed24
+  node_type: pipeline
+  label: Build Analysis - open_disputes_analysis
+  description: Generates detailed analysis of open disputes
+  position:
+    x: 2360.0
+    y: 219.0
+  config:
+    full_refresh: false
+    models:
+    - open_disputes_analysis
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: dbt_1f3e59c0
+  node_type: pipeline
+  label: Build Report - ceo_daily_disputes_report
+  description: Generates the daily CEO report on disputes
+  position:
+    x: 2920.0
+    y: 219.0
+  config:
+    full_refresh: false
+    models:
+    - ceo_daily_disputes_report
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0

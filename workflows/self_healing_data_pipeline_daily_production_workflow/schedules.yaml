@@ -1,0 +1,7 @@
+- name: 'Trigger: Daily Schedule - 2 AM UTC'
+  description: Auto-generated schedule for trigger node trigger_c9627ad2
+  schedule_type: cron
+  cron_expression: 0 2 * * *
+  timezone: UTC
+  interval_minutes: null
+  is_active: true

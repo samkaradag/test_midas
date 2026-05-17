@@ -1,0 +1,20 @@
+name: Payment Data Pipeline Orchestration - Comprehensive
+description: Enterprise-grade orchestration workflow for payment data pipeline with
+  multi-stage processing, error handling, auto-remediation, performance optimization,
+  and comprehensive monitoring. Includes ingestion, transformation, validation, error
+  recovery, and analytics.
+version: 1.0.0
+status: paused
+tags:
+- payments
+- orchestration
+- production
+- data-engineering
+- auto-remediation
+- performance-monitoring
+max_concurrent_runs: 1
+timeout_minutes: 60
+retry_policy:
+  max_retries: 3
+  retry_delay: 60
+_exported_at: '2026-05-17T02:35:39Z'

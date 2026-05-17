@@ -1,0 +1,5 @@
+- edge_id: edge_f24199b3
+  source_node_id: trigger_54b476d0
+  target_node_id: spark_d849b5c3
+  label: ''
+  condition: success

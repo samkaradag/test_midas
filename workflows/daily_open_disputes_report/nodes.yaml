@@ -1,0 +1,110 @@
+- node_id: dbt_746f871d
+  node_type: pipeline
+  label: Run Open Disputes Daily Report
+  description: Executes the mart_open_disputes_daily dbt model to generate daily dispute
+    metrics
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    full_refresh: false
+    models:
+    - mart_open_disputes_daily
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_email_3c9d5146
+  node_type: notification
+  label: Send Email Report to CEO
+  description: Sends comprehensive daily disputes report to CEO with metrics, top
+    aged disputes, and severity breakdown
+  position:
+    x: 800.0
+    y: 200.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: '**Daily Open Disputes Report**
+
+
+      Executive Summary:
+
+      - Total Open Disputes: [Query from mart_open_disputes_daily]
+
+      - Total Amount at Risk: [Query from mart_open_disputes_daily]
+
+      - Critical Disputes Count: [Query from mart_open_disputes_daily]
+
+
+      ---
+
+
+      **Top 10 Oldest Open Disputes** (Ordered by Days Open)
+
+      [Disputes ranked by age, showing dispute_id, amount, days_open, severity]
+
+
+      ---
+
+
+      **Disputes by Severity Breakdown**
+
+      - Critical: [Count & Total Amount]
+
+      - High: [Count & Total Amount]
+
+      - Medium: [Count & Total Amount]
+
+      - Low: [Count & Total Amount]
+
+
+      ---
+
+
+      **For Detailed Analysis:**
+
+      BigQuery Table: `{project}.disputes_analytics.mart_open_disputes_daily`
+
+      Dashboard: [Link to Looker/Tableau dashboard if available]
+
+
+      Report Generated: {{timestamp}}
+
+      Workflow: {{workflow_name}}
+
+      Status: {{status}}'
+    recipients: ceo@dagen.ai
+    subject: Daily Open Disputes Report - {{timestamp}}
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: trigger_72ffb475
+  node_type: trigger
+  label: Daily Trigger - 8:00 AM UTC
+  description: Triggers the workflow daily at 8:00 AM UTC for executive reporting
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: 0 8 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0

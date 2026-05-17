@@ -1,0 +1,106 @@
+- node_id: agent_270ad5d8
+  node_type: agent
+  label: Query and Format Disputes Report Data
+  description: Queries BigQuery for disputes report data and formats it as HTML for
+    email
+  position:
+    x: 800.0
+    y: 200.0
+  config: {}
+  agent_id: data_insights_agent
+  agent_instructions: 'Query the BigQuery table ''prd-dagen.payments_v1.ceo_daily_disputes_report''
+    using connection ID 8 and extract the following metrics:
+
+    1. Total open disputes count
+
+    2. Total amount at risk (sum of dispute amounts)
+
+    3. Average dispute age in days
+
+    4. Top dispute reasons breakdown (top 5 reasons with counts)
+
+    5. Disputes by aging bucket breakdown (0-30 days, 31-60 days, 61-90 days, 90+
+    days)
+
+    6. High-value disputes (>$10k) count and total amount
+
+
+    Format the output as an HTML email body with professional styling that includes:
+
+    - A header with today''s date
+
+    - Clear sections for each metric
+
+    - Tables for the breakdown data
+
+    - Professional color scheme and formatting
+
+    - Include a summary section at the top with key metrics
+
+
+    Return the HTML as a string that can be used in an email notification.'
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 15
+  retry_count: 0
+- node_id: dbt_5ce75293
+  node_type: pipeline
+  label: Run Disputes Reporting Pipeline
+  description: Executes the disputes_reporting DBT pipeline to refresh open_disputes_analysis
+    and ceo_daily_disputes_report models
+  position:
+    x: 450.0
+    y: 200.0
+  config:
+    full_refresh: false
+    models: []
+    project_name: disputes_reporting
+    run_command: run
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: dbt_disputes_reporting_1771258227
+  pipeline_type: dbt
+  timeout_minutes: 30
+  retry_count: 0
+- node_id: notification_email_768c60d1
+  node_type: notification
+  label: Send CEO Disputes Report Email
+  description: Sends the formatted disputes report to the CEO via email
+  position:
+    x: 1150.0
+    y: 200.0
+  config:
+    channel_type: email
+    include_previous_output: true
+    message: '{{previous_output}}'
+    recipients: ceo@dagen.ai
+    subject: Daily Open Disputes Report - {{timestamp}}
+    webhook_headers: {}
+    webhook_method: POST
+    webhook_url: ''
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 5
+  retry_count: 0
+- node_id: trigger_a23afb4f
+  node_type: trigger
+  label: Daily Schedule - 6:00 AM UTC
+  description: Triggers the workflow daily at 6:00 AM UTC
+  position:
+    x: 100.0
+    y: 200.0
+  config:
+    expression: 0 6 * * *
+    type: schedule
+  agent_id: null
+  agent_instructions: null
+  agent_config: {}
+  pipeline_id: null
+  pipeline_type: null
+  timeout_minutes: 30
+  retry_count: 0
