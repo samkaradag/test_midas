@@ -1,0 +1,30 @@
+schema_version: 1
+goal: ''
+business:
+  domain: ''
+  owner: ''
+  stakeholders: []
+  data_classification: ''
+  sla: {}
+  cost_center: ''
+  tags: []
+technical:
+  destination_connection_id: null
+  destination_database: ''
+  destination_schema: ''
+  schedule: ''
+  upstream_dependencies: []
+  downstream_consumers: []
+  runtime: ''
+  tags: []
+auto_fix:
+  enabled: true
+  branch_pattern: agents/auto-fix/{pipeline_name}/{run_id}
+  base_branch: ''
+  max_attempts: 3
+  cooldown_minutes: 30
+  notification_channel_ids: []
+tags: []
+custom: {}
+updated_at: '2026-05-18T19:54:55+00:00'
+updated_by: user:EqoTgI6Y1bZZZyGpoW4lJsBmyGR2
