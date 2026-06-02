@@ -47,8 +47,8 @@ sources:
             data_type: STRING
             tests:
               - not_null
-          - name: debtor_customer_id
-            description: Customer ID of the payer
+          - name: debtor_cus_id
+            description: Customer ID of the payer (shortened column name from source)
             data_type: STRING
           - name: creditor_customer_id
             description: Customer ID of the payee

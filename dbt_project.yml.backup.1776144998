@@ -86,21 +86,6 @@ models:
         +description: "Cleaned and deduplicated payouts (359K → 21 rows)"
         +tags: ['staging', 'payouts']
 
-      stg_transactions_enriched:
-        +materialized: table
-        +description: "Enriched transactions with fraud labels, customer, and payment method details"
-        +tags: ['staging', 'fraud', 'transactions']
-
-      stg_customer_profile:
-        +materialized: table
-        +description: "Deduplicated and enriched customer profiles with KYC status and risk scores"
-        +tags: ['staging', 'fraud', 'customer_features']
-
-      stg_payment_method_risk:
-        +materialized: table
-        +description: "Payment method profiles with age, type, and historical dispute rate for risk assessment"
-        +tags: ['staging', 'fraud', 'payment_features']
-
     # ========================================================================
     # DIMENSION LAYER - Star Schema
     # ========================================================================

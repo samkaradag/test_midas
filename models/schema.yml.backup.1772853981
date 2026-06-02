@@ -77,7 +77,6 @@ models:
     description: >
       Cleaned transactions. Deduplicates raw records, validates status values,
       and ensures debtor and creditor are different entities.
-      FIXED: Maps source column debtor_cus_id → debtor_customer_id for consistency.
       Input: 359,262 rows → Output: ~21 rows
     columns:
       - name: transaction_id
@@ -104,6 +103,8 @@ models:
         data_type: NUMERIC
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_of_type:
+              column_type: numeric
       - name: currency
         description: Currency code (e.g., USD, EUR)
         data_type: STRING
@@ -129,8 +130,10 @@ models:
     description: >
       CRITICAL: Rebuilt transaction ledger structure. Fixes broken state where each transaction
       had 17,108 ledger entries instead of the correct 2 entries (1 debit, 1 credit).
+      
       Strategy: Groups by transaction_id and direction, aggregates amounts, and validates
       double-entry accounting (sum of debits = sum of credits).
+      
       Input: 359,268 rows (17,108 per transaction) → Output: ~42 rows (2 per transaction)
     columns:
       - name: transaction_id
@@ -358,238 +361,6 @@ models:
         data_type: TIMESTAMP
       - name: created_at
         description: Record creation timestamp
-        data_type: TIMESTAMP
-
-  # ============================================================================
-  # FRAUD ANALYTICS STAGING MODELS
-  # ============================================================================
-
-  - name: stg_transactions_fraud
-    description: >
-      Transactions enriched with fraud indicator from disputes. Joins stg_transactions
-      with stg_disputes to add is_fraud flag (1 if transaction has a dispute, 0 otherwise).
-      Used as the base for fraud analytics and ML feature engineering.
-    columns:
-      - name: transaction_id
-        description: Unique transaction identifier
-        data_type: STRING
-        tests:
-          - not_null
-          - unique
-      - name: debtor_customer_id
-        description: Customer ID of the payer
-        data_type: STRING
-        tests:
-          - not_null
-      - name: creditor_customer_id
-        description: Customer ID of the payee
-        data_type: STRING
-        tests:
-          - not_null
-      - name: payment_method_id
-        description: Payment method used for this transaction
-        data_type: STRING
-      - name: amount
-        description: Transaction amount
-        data_type: NUMERIC
-        tests:
-          - not_null
-      - name: currency
-        description: Currency code
-        data_type: STRING
-      - name: status
-        description: Transaction status
-        data_type: STRING
-      - name: reference
-        description: Transaction reference number
-        data_type: STRING
-      - name: is_fraud
-        description: Fraud indicator (1 if transaction has a dispute, 0 otherwise)
-        data_type: INTEGER
-        tests:
-          - not_null
-          - accepted_values:
-              values: [0, 1]
-      - name: dispute_id
-        description: Associated dispute ID (null if no dispute)
-        data_type: STRING
-      - name: dispute_amount
-        description: Dispute amount (null if no dispute)
-        data_type: NUMERIC
-      - name: dispute_reason
-        description: Reason for dispute (null if no dispute)
-        data_type: STRING
-      - name: dispute_status
-        description: Dispute status (null if no dispute)
-        data_type: STRING
-      - name: created_at
-        description: Transaction creation timestamp
-        data_type: TIMESTAMP
-      - name: updated_at
-        description: Transaction last update timestamp
-        data_type: TIMESTAMP
-
-  - name: stg_customer_transaction_history
-    description: >
-      Customer transaction history aggregates for ML feature engineering.
-      Computes transaction counts, totals, averages, and temporal features per customer.
-      One row per unique customer_id from debtor_customer_id in stg_transactions_fraud.
-    columns:
-      - name: customer_id
-        description: Unique customer identifier
-        data_type: STRING
-        tests:
-          - not_null
-          - unique
-      - name: total_transactions
-        description: Total number of transactions by this customer
-        data_type: INTEGER
-        tests:
-          - not_null
-      - name: fraud_transactions
-        description: Number of fraudulent transactions (with disputes)
-        data_type: INTEGER
-      - name: legitimate_transactions
-        description: Number of legitimate transactions (no disputes)
-        data_type: INTEGER
-      - name: total_amount
-        description: Total transaction amount across all transactions
-        data_type: NUMERIC
-      - name: avg_amount
-        description: Average transaction amount
-        data_type: NUMERIC
-      - name: min_amount
-        description: Minimum transaction amount
-        data_type: NUMERIC
-      - name: max_amount
-        description: Maximum transaction amount
-        data_type: NUMERIC
-      - name: stddev_amount
-        description: Standard deviation of transaction amounts
-        data_type: NUMERIC
-      - name: completed_transactions
-        description: Number of completed transactions
-        data_type: INTEGER
-      - name: failed_transactions
-        description: Number of failed transactions
-        data_type: INTEGER
-      - name: pending_transactions
-        description: Number of pending transactions
-        data_type: INTEGER
-      - name: first_transaction_date
-        description: Date of first transaction
-        data_type: TIMESTAMP
-      - name: last_transaction_date
-        description: Date of most recent transaction
-        data_type: TIMESTAMP
-      - name: days_active
-        description: Number of days between first and last transaction
-        data_type: INTEGER
-      - name: fraud_rate_pct
-        description: Percentage of transactions that are fraudulent (0-100)
-        data_type: NUMERIC
-      - name: dbt_created_at
-        description: When this record was created by dbt
-        data_type: TIMESTAMP
-
-  - name: stg_fraud_features
-    description: >
-      ML-ready fraud features derived from transactions, customer history, and payment methods.
-      Includes behavioral, temporal, and monetary features for fraud detection models.
-      One row per transaction with comprehensive feature set.
-    columns:
-      - name: transaction_id
-        description: Unique transaction identifier
-        data_type: STRING
-        tests:
-          - not_null
-      - name: debtor_customer_id
-        description: Customer ID of the payer
-        data_type: STRING
-        tests:
-          - not_null
-      - name: creditor_customer_id
-        description: Customer ID of the payee
-        data_type: STRING
-        tests:
-          - not_null
-      - name: payment_method_id
-        description: Payment method used
-        data_type: STRING
-      - name: fraud_label
-        description: Target variable for ML (1=fraud, 0=legitimate)
-        data_type: INTEGER
-        tests:
-          - not_null
-          - accepted_values:
-              values: [0, 1]
-      - name: transaction_amount
-        description: Transaction amount in original currency
-        data_type: NUMERIC
-        tests:
-          - not_null
-      - name: currency
-        description: Currency code
-        data_type: STRING
-      - name: transaction_status
-        description: Transaction status
-        data_type: STRING
-      - name: transaction_hour
-        description: Hour of day when transaction occurred (0-23)
-        data_type: INTEGER
-      - name: transaction_day_of_week
-        description: Day of week (1=Sunday, 7=Saturday)
-        data_type: INTEGER
-      - name: transaction_date
-        description: Date of transaction
-        data_type: DATE
-      - name: customer_lifetime_transactions
-        description: Total transactions by this customer
-        data_type: INTEGER
-      - name: customer_fraud_rate_pct
-        description: Historical fraud rate for this customer
-        data_type: NUMERIC
-      - name: customer_avg_transaction_amount
-        description: Customer's average transaction amount
-        data_type: NUMERIC
-      - name: customer_stddev_transaction_amount
-        description: Customer's transaction amount standard deviation
-        data_type: NUMERIC
-      - name: customer_completed_transactions
-        description: Number of completed transactions by customer
-        data_type: INTEGER
-      - name: customer_failed_transactions
-        description: Number of failed transactions by customer
-        data_type: INTEGER
-      - name: customer_days_active
-        description: Days between customer's first and last transaction
-        data_type: INTEGER
-      - name: amount_zscore
-        description: Z-score of transaction amount vs customer average
-        data_type: NUMERIC
-      - name: is_max_amount_exceeded
-        description: Whether transaction exceeds customer's historical max
-        data_type: INTEGER
-      - name: method_type
-        description: Type of payment method (card, bank_account, etc.)
-        data_type: STRING
-      - name: payment_method_is_default
-        description: Whether this is customer's default payment method
-        data_type: BOOLEAN
-      - name: kyc_status
-        description: Customer's KYC verification status
-        data_type: STRING
-      - name: is_kyc_verified
-        description: Whether customer is KYC verified (1=yes, 0=no)
-        data_type: INTEGER
-      - name: customer_risk_segment
-        description: Risk segment based on fraud rate (low_risk, medium_risk, high_risk)
-        data_type: STRING
-        tests:
-          - accepted_values:
-              values: ['low_risk', 'medium_risk', 'high_risk']
-      - name: created_at
-        description: Transaction creation timestamp
         data_type: TIMESTAMP
 
   # ============================================================================
