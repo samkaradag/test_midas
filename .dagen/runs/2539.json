@@ -1,0 +1,13 @@
+{
+  "job_run_id": 2539,
+  "runtime_job_id": "dagen/dagen-dbt-dbt-projects-1792198928",
+  "status": "success",
+  "workspace_id": 3,
+  "pipeline_id": "dbt_test_midas_1771132375",
+  "dbt_command": "compile",
+  "extra_args": [],
+  "started_at": "2026-10-17T01:02:09",
+  "completed_at": "2026-10-17T01:03:02",
+  "error_message": null,
+  "persisted_at": "2026-10-17T01:03:51.860385+00:00"
+}

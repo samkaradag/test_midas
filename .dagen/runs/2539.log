@@ -1,0 +1,18 @@
+[dagen-dbt 01:02:20] starting dbt runner
+[dagen-dbt 01:02:20] python=/usr/local/bin/python3 home=/work/home cwd=/usr/app/dbt
+[dagen-dbt 01:02:21] rewrote test_midas.dev.keyfile -> /work/project/keyfile.json
+[dagen-dbt 01:02:21] dbt already installed in image; skipping pip install
+[dagen-dbt 01:02:21] running: /usr/local/bin/dbt compile --profiles-dir /work/project --project-dir /work/project
+[0m01:02:21  Running with dbt=1.9.0
+[0m01:02:22  Registered adapter: bigquery=1.9.0
+[0m01:02:22  Unable to do partial parsing because of a version mismatch
+[0m01:02:23  [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 1 unused configuration paths:
+- seeds.test_midas
+[0m01:02:23  Found 21 models, 134 data tests, 10 sources, 487 macros
+[0m01:02:23  
+[0m01:02:23  Concurrency: 4 threads (target='dev')
+[0m01:02:23  
+[dagen-dbt 01:02:25] dbt exited with rc=0
+[dagen] compiled output collected out-of-band
+[dagen-dbt 01:02:26] published compiled output (290357 bytes, sha256=b813bf7aa5df)
