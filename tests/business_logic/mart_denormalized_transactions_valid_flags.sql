@@ -8,6 +8,9 @@ select
     is_fee_currency_valid,
     is_leg_currency_valid,
     is_refund_within_transaction_amount,
+    has_ledger,
+    is_leg_count_consistent,
+    is_ledger_balanced,
     'one or more transaction business validation flags failed' as failure_reason
 from {{ ref('mart_denormalized_transactions') }}
 where not coalesce(is_nonnegative_transaction_amount, false)
