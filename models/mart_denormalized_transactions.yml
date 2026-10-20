@@ -44,13 +44,13 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_customers')
+              to: source('raw_data', 'customers')
               field: customer_id
       - name: creditor_customer_id
         tests:
           - not_null
           - relationships:
-              to: ref('stg_customers')
+              to: source('raw_data', 'customers')
               field: customer_id
       - name: payment_method_id
         tests:
