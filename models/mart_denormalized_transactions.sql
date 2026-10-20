@@ -29,9 +29,10 @@ with transactions_ranked as (
     where transaction_id is not null
 ),
 transactions_current as (
-    select * except(version_rank)
+    select * except(version_rank, _ab_cdc_deleted_at)
     from transactions_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
 ),
 customers_ranked as (
     select
@@ -57,9 +58,10 @@ customers_ranked as (
     where customer_id is not null
 ),
 customers_current as (
-    select * except(version_rank)
+    select * except(version_rank, _ab_cdc_deleted_at)
     from customers_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
 ),
 payment_methods_ranked as (
     select
@@ -83,9 +85,10 @@ payment_methods_ranked as (
     where payment_method_id is not null
 ),
 payment_methods_current as (
-    select * except(version_rank)
+    select * except(version_rank, _ab_cdc_deleted_at)
     from payment_methods_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
 ),
 refunds_ranked as (
     select
