@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: mart_denormalized_transactions
+    description: >-
+      Daily analytics mart at exactly one row per current transaction. Airbyte CDC
+      versions are resolved to the latest non-deleted record before every join;
+      refunds, disputes, fees, and ledger legs are aggregated to transaction grain.
+      Invalid business states remain visible through validation flags and tests.
+    config:
+      meta:
+        owner: payments_analytics
+        consumers:
+          - analytics_dashboards
+          - finance_reporting
+          - operations_reporting
+        grain: one row per transaction_id
+        unique_key: transaction_id
+        freshness_sla: daily
+        freshness_warn_after_hours: 24
+        freshness_error_after_hours: 48
+    columns:
+      - name: transaction_id
+        description: Natural transaction key and model grain.
+        tests:
+          - not_null
+          - unique
+      - name: transaction_amount
+        description: Latest transaction amount before refunds and fees.
+        tests:
+          - not_null
+      - name: currency
+        tests:
+          - not_null
+      - name: transaction_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['pending', 'completed', 'failed', 'cancelled']
+      - name: transaction_created_at
+        tests:
+          - not_null
+      - name: debtor_customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: creditor_customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: payment_method_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_payment_methods')
+              field: payment_method_id
+      - name: refund_count
+        tests:
+          - not_null
+      - name: dispute_count
+        tests:
+          - not_null
+      - name: fee_count
+        tests:
+          - not_null
+      - name: leg_count
+        tests:
+          - not_null
+      - name: total_refund_amount
+        tests:
+          - not_null
+      - name: total_fee_amount
+        tests:
+          - not_null
+      - name: net_transaction_amount
+        tests:
+          - not_null
+      - name: is_ledger_balanced
+        description: True when deduplicated debit and credit totals differ by no more than 0.01; no assumption is made about leg count.
+        tests:
+          - not_null
+      - name: dbt_updated_at
+        tests:
+          - not_null
