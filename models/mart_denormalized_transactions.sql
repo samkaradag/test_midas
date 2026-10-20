@@ -123,6 +123,7 @@ refunds_by_transaction as (
         any_value(currency having max coalesce(updated_at, created_at)) as refund_currency
     from refunds_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
       and transaction_id is not null
     group by transaction_id
 ),
@@ -159,6 +160,7 @@ disputes_by_transaction as (
         any_value(currency having max coalesce(updated_at, created_at)) as dispute_currency
     from disputes_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
       and transaction_id is not null
     group by transaction_id
 ),
@@ -191,6 +193,7 @@ fees_by_transaction as (
         any_value(currency having max created_at) as fee_currency
     from fees_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
       and transaction_id is not null
     group by transaction_id
 ),
@@ -232,6 +235,7 @@ legs_by_transaction as (
         any_value(currency having max created_at) as leg_currency
     from legs_ranked
     where version_rank = 1
+      and _ab_cdc_deleted_at is null
       and transaction_id is not null
     group by transaction_id
 )
