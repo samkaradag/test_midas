@@ -1,7 +1,5 @@
 {{ config(
-    materialized='incremental',
-    incremental_strategy='merge',
-    unique_key='transaction_id',
+    materialized='table',
     on_schema_change='fail',
     tags=['mart', 'transactions', 'daily', 'business_validation']
 ) }}
