@@ -16,6 +16,7 @@ with transactions_ranked as (
         status,
         created_at,
         updated_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by transaction_id
             order by
@@ -43,6 +44,7 @@ customers_ranked as (
         risk_profile,
         created_at,
         updated_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by customer_id
             order by
@@ -68,6 +70,7 @@ payment_methods_ranked as (
         is_default,
         created_at,
         updated_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by payment_method_id
             order by
@@ -94,6 +97,7 @@ refunds_ranked as (
         status,
         created_at,
         updated_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by refund_id
             order by
@@ -129,6 +133,7 @@ disputes_ranked as (
         status,
         created_at,
         updated_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by dispute_id
             order by
@@ -162,6 +167,7 @@ fees_ranked as (
         currency,
         fee_type,
         created_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by fee_id
             order by
@@ -194,6 +200,7 @@ legs_ranked as (
         currency,
         account,
         created_at,
+        _ab_cdc_deleted_at,
         row_number() over (
             partition by leg_id
             order by
