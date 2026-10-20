@@ -1,3 +1,4 @@
+-- dagen:failed_job_id: 2590
 with ranked_source as (
     select
         transaction_id,
@@ -20,21 +21,22 @@ expected as (
       and _ab_cdc_deleted_at is null
 ),
 actual as (
-    select transaction_id
-    from {{ ref('mart_denormalized_transactions') }}
+    select transaction_id from {{ ref('mart_denormalized_transactions_serving') }}
+    union all
+    select transaction_id from {{ ref('mart_denormalized_transactions_errors') }}
 ),
 reconciled as (
     select
         coalesce(expected.transaction_id, actual.transaction_id) as transaction_id,
-        expected.transaction_id is null as unexpected_target_row,
-        actual.transaction_id is null as missing_target_row
+        expected.transaction_id is null as unexpected_output_row,
+        actual.transaction_id is null as missing_output_row
     from expected
     full outer join actual using (transaction_id)
 )
 select
     transaction_id,
-    unexpected_target_row,
-    missing_target_row,
-    'target transaction keys do not reconcile to latest current source keys' as failure_reason
+    unexpected_output_row,
+    missing_output_row,
+    'serving plus errors do not reconcile to latest current source keys' as failure_reason
 from reconciled
-where unexpected_target_row or missing_target_row
+where unexpected_output_row or missing_output_row

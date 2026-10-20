@@ -1,5 +1,7 @@
+-- dagen:failed_job_id: 2590
 {{ config(
     materialized='table',
+    alias='int_denormalized_transactions_all',
     on_schema_change='fail',
     tags=['mart', 'transactions', 'daily', 'business_validation']
 ) }}

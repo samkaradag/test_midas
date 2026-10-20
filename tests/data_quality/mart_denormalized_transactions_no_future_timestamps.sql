@@ -1,3 +1,4 @@
+-- dagen:failed_job_id: 2590
 select
     transaction_id,
     transaction_created_at,
@@ -6,7 +7,7 @@ select
     latest_dispute_at,
     latest_fee_at,
     'future timestamp detected' as failure_reason
-from {{ ref('mart_denormalized_transactions') }}
+from {{ ref('mart_denormalized_transactions_serving') }}
 where transaction_created_at > current_timestamp()
    or transaction_updated_at > current_timestamp()
    or latest_refund_at > current_timestamp()

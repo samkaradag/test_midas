@@ -1,7 +1,8 @@
+# dagen:failed_job_id: 2590
 version: 2
 
 models:
-  - name: mart_denormalized_transactions
+  - name: mart_denormalized_transactions_serving
     description: >-
       Daily analytics mart at exactly one row per current transaction. Airbyte CDC
       versions are resolved to the latest non-deleted record before every join;

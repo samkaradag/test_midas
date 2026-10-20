@@ -1,3 +1,4 @@
+-- dagen:failed_job_id: 2590
 select
     transaction_id,
     leg_count,
@@ -14,7 +15,7 @@ select
         when leg_count != debit_leg_count + credit_leg_count then 'ledger contains unclassified directions or inconsistent counts'
         else 'ledger debit and credit totals are not balanced'
     end as failure_reason
-from {{ ref('mart_denormalized_transactions') }}
+from {{ ref('mart_denormalized_transactions_serving') }}
 where not has_ledger
    or not is_leg_count_consistent
    or not is_ledger_balanced

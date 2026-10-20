@@ -1,3 +1,4 @@
+-- dagen:failed_job_id: 2590
 with ranked_source as (
     select
         transaction_id,
@@ -19,15 +20,22 @@ expected as (
     where version_rank = 1
       and _ab_cdc_deleted_at is null
 ),
-actual as (
-    select count(*) as actual_count
-    from {{ ref('mart_denormalized_transactions') }}
+serving as (
+    select count(*) as serving_count
+    from {{ ref('mart_denormalized_transactions_serving') }}
+),
+errors as (
+    select count(*) as error_count
+    from {{ ref('mart_denormalized_transactions_errors') }}
 )
 select
     expected_count,
-    actual_count,
-    actual_count - expected_count as count_difference,
-    'target row count differs from latest current source transaction count' as failure_reason
+    serving_count,
+    error_count,
+    serving_count + error_count as actual_count,
+    serving_count + error_count - expected_count as count_difference,
+    'serving plus errors count differs from latest current source transaction count' as failure_reason
 from expected
-cross join actual
-where expected_count != actual_count
+cross join serving
+cross join errors
+where expected_count != serving_count + error_count

@@ -1,3 +1,4 @@
+-- dagen:failed_job_id: 2590
 select
     transaction_id,
     is_nonnegative_transaction_amount,
@@ -12,7 +13,7 @@ select
     is_leg_count_consistent,
     is_ledger_balanced,
     'one or more transaction business validation flags failed' as failure_reason
-from {{ ref('mart_denormalized_transactions') }}
+from {{ ref('mart_denormalized_transactions_serving') }}
 where not coalesce(is_nonnegative_transaction_amount, false)
    or not coalesce(has_distinct_parties, false)
    or not coalesce(is_valid_transaction_status, false)

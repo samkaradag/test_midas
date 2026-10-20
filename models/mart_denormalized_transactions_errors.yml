@@ -1,0 +1,25 @@
+# dagen:failed_job_id: 2590
+version: 2
+
+models:
+  - name: mart_denormalized_transactions_errors
+    description: >-
+      Durable transaction-grain quarantine for rows rejected from the serving mart.
+      Preserves source values, validation flags, pipe-delimited rejection reasons,
+      and rejection timestamp without coercing or dropping invalid business data.
+    config:
+      meta:
+        owner: payments_analytics
+        grain: one row per rejected transaction_id
+        freshness_sla: daily
+    columns:
+      - name: transaction_id
+        tests:
+          - not_null
+          - unique
+      - name: rejection_reasons
+        tests:
+          - not_null
+      - name: rejected_at
+        tests:
+          - not_null

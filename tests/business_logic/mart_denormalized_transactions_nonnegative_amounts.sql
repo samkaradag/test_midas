@@ -1,3 +1,4 @@
+-- dagen:failed_job_id: 2590
 select
     transaction_id,
     transaction_amount,
@@ -8,7 +9,7 @@ select
     total_debit_amount,
     total_credit_amount,
     'negative financial amount' as failure_reason
-from {{ ref('mart_denormalized_transactions') }}
+from {{ ref('mart_denormalized_transactions_serving') }}
 where transaction_amount < 0
    or total_refund_amount < 0
    or completed_refund_amount < 0
