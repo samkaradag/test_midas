@@ -1,0 +1,29 @@
+{
+  "job_run_id": "review_1792466703_8115",
+  "kind": "dbt",
+  "status": "review_challenged",
+  "source": "pre_exec_evaluator",
+  "pipeline_id": "test_midas",
+  "exception": "Job 2590 exposed a duplicated BigQuery schema config defect; three test failures are genuine mandatory source-quality gates, not evidence to weaken tests.",
+  "file_path": "dbt_project.yml",
+  "line": null,
+  "source_excerpt": "Job 2590: model success, 21 rows; PASS=30, ERROR=3. ledger_balanced=21 failures, nonnegative_amounts=10, valid_flags=21. Compiled relation: prd-dagen.payments_v1_payments_v1.mart_denormalized_transactions.",
+  "findings": [
+    {
+      "severity": "error",
+      "code": "DBT_DUPLICATED_TARGET_SCHEMA",
+      "message": "Compiled model and tests target prd-dagen.payments_v1_payments_v1 instead of the contracted prd-dagen.payments_v1 because the profile dataset and project custom schema both contribute payments_v1.",
+      "fix_hint": "Remove the redundant project/model +schema: payments_v1 configuration (or implement a narrowly verified generate_schema_name override), then parse/compile and confirm the model and all tests resolve exactly to prd-dagen.payments_v1.mart_denormalized_transactions before retrying.",
+      "file_path": "dbt_project.yml"
+    },
+    {
+      "severity": "error",
+      "code": "MANDATORY_SOURCE_QUALITY_GATES_FAILED",
+      "message": "The model built 21 rows, but real data violated mandatory controls: all 21 rows failed ledger/combined flags and 10 rows contained negative financial amounts. The compiled tests query the built relation correctly and implement the approved contract; this is source/business-quality failure, not credential/runtime failure.",
+      "fix_hint": "Do not weaken or delete the tests and do not coerce negative or ledger values silently. Inspect grouped failing reasons/fields from the materialized 21-row relation, then either remediate upstream source data or obtain explicit product approval for a documented quarantine/warning policy that preserves flags. Keep the existing error gates until such a policy is approved.",
+      "file_path": "tests/business_logic/mart_denormalized_transactions_valid_flags.sql"
+    }
+  ],
+  "developer_agent": "dbt",
+  "persisted_at": "2026-10-20T03:25:03.811505+00:00"
+}
