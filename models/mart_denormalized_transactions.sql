@@ -227,6 +227,7 @@ legs_by_transaction as (
         sum(if(lower(direction) = 'credit', amount, cast(0 as numeric))) as total_credit_amount,
         sum(if(lower(direction) = 'debit', amount, cast(0 as numeric)))
           - sum(if(lower(direction) = 'credit', amount, cast(0 as numeric))) as ledger_net_amount,
+        countif(lower(direction) in ('debit', 'credit')) = count(*) as is_leg_count_consistent,
         abs(
             sum(if(lower(direction) = 'debit', amount, cast(0 as numeric)))
               - sum(if(lower(direction) = 'credit', amount, cast(0 as numeric)))
