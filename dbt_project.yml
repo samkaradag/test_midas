@@ -1,3 +1,4 @@
+# dagen:failed_job_id: 2590
 # ============================================================================
 # DBT Project Configuration: test_midas
 # ============================================================================
@@ -40,14 +41,12 @@ models:
   test_midas:
     # Default materialization for all models
     +materialized: table
-    +schema: payments_v1
 
     # ========================================================================
     # STAGING LAYER - Data Cleaning and Deduplication
     # ========================================================================
     staging:
       +materialized: view
-      +schema: payments_v1
       +tags: ['staging']
 
       stg_customers:
@@ -91,19 +90,16 @@ models:
     # ========================================================================
     dim_customers:
       +materialized: table
-      +schema: payments_v1
       +description: "Customer dimension with surrogate and natural keys (34 rows)"
       +tags: ['dimension', 'customers']
 
     dim_payment_methods:
       +materialized: table
-      +schema: payments_v1
       +description: "Payment methods dimension (21 rows)"
       +tags: ['dimension', 'payment_methods']
 
     dim_date:
       +materialized: table
-      +schema: payments_v1
       +description: "Date dimension (2025-07-26 to 2025-09-08, 44 rows)"
       +tags: ['dimension', 'date']
 
@@ -112,19 +108,16 @@ models:
     # ========================================================================
     fact_transactions:
       +materialized: table
-      +schema: payments_v1
       +description: "Transaction fact table with dimensional foreign keys (21 rows)"
       +tags: ['fact', 'transactions']
 
     fact_transaction_details:
       +materialized: table
-      +schema: payments_v1
       +description: "Transaction details with aggregated refunds, disputes, fees (21 rows)"
       +tags: ['fact', 'transaction_details']
 
     fact_payouts:
       +materialized: table
-      +schema: payments_v1
       +description: "Payout fact table with dimensional foreign keys (21 rows)"
       +tags: ['fact', 'payouts']
 
@@ -147,15 +140,13 @@ vars:
 # ============================================================================
 seeds:
   test_midas:
-    +schema: payments_v1
     +tags: ['seed']
 
 # ============================================================================
 # Snapshots Configuration
 # ============================================================================
 snapshots:
-  test_midas:
-    +schema: payments_v1_snapshots
+  test_midas:_snapshots
     +tags: ['snapshot']
 
 # ============================================================================
