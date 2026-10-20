@@ -1,0 +1,14 @@
+{
+  "job_run_id": 2590,
+  "kind": "dbt",
+  "status": "failed",
+  "workspace_id": 3,
+  "pipeline_id": "67",
+  "main_file": "dbt_project.yml",
+  "dbt_command": "build",
+  "exception": "Collecting exceptiongroup>=1.0.2",
+  "file_path": null,
+  "line": null,
+  "source_excerpt": null,
+  "persisted_at": "2026-10-20T03:21:12.020313+00:00"
+}
