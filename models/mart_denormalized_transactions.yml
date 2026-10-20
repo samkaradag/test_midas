@@ -79,6 +79,14 @@ models:
       - name: net_transaction_amount
         tests:
           - not_null
+      - name: has_ledger
+        description: True only when at least one current non-deleted ledger leg exists.
+        tests:
+          - not_null
+      - name: is_leg_count_consistent
+        description: True when leg_count equals debit_leg_count plus credit_leg_count.
+        tests:
+          - not_null
       - name: is_ledger_balanced
         description: True when deduplicated debit and credit totals differ by no more than 0.01; no assumption is made about leg count.
         tests:

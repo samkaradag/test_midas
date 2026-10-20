@@ -1,8 +1,23 @@
-with expected as (
-    select distinct transaction_id
+with ranked_source as (
+    select
+        transaction_id,
+        _ab_cdc_deleted_at,
+        row_number() over (
+            partition by transaction_id
+            order by
+                coalesce(updated_at, created_at) desc,
+                _ab_cdc_lsn desc,
+                _airbyte_extracted_at desc,
+                _airbyte_raw_id desc
+        ) as version_rank
     from {{ source('raw_data', 'transactions') }}
-    where _ab_cdc_deleted_at is null
-      and transaction_id is not null
+    where transaction_id is not null
+),
+expected as (
+    select transaction_id
+    from ranked_source
+    where version_rank = 1
+      and _ab_cdc_deleted_at is null
 ),
 actual as (
     select transaction_id
@@ -20,6 +35,6 @@ select
     transaction_id,
     unexpected_target_row,
     missing_target_row,
-    'target transaction keys do not reconcile to current non-deleted source keys' as failure_reason
+    'target transaction keys do not reconcile to latest current source keys' as failure_reason
 from reconciled
 where unexpected_target_row or missing_target_row

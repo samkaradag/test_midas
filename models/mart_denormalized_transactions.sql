@@ -291,7 +291,12 @@ select
     coalesce(legs.total_debit_amount, cast(0 as numeric)) as total_debit_amount,
     coalesce(legs.total_credit_amount, cast(0 as numeric)) as total_credit_amount,
     coalesce(legs.ledger_net_amount, cast(0 as numeric)) as ledger_net_amount,
-    coalesce(legs.is_ledger_balanced, true) as is_ledger_balanced,
+    coalesce(legs.leg_count, 0) > 0 as has_ledger,
+    coalesce(legs.is_leg_count_consistent, false) as is_leg_count_consistent,
+    case
+        when coalesce(legs.leg_count, 0) = 0 then false
+        else coalesce(legs.is_ledger_balanced, false)
+    end as is_ledger_balanced,
 
     tx.amount
       - coalesce(refunds.completed_refund_amount, cast(0 as numeric))
