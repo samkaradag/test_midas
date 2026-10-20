@@ -56,7 +56,7 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('stg_payment_methods')
+              to: source('raw_data', 'payment_methods')
               field: payment_method_id
       - name: refund_count
         tests:

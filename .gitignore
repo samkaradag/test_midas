@@ -37,3 +37,5 @@ derby.log
 # Logs and temporary files
 *.log
 
+# Focused failure memory for agent fix loops
+.dagen/fails/
