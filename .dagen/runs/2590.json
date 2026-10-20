@@ -1,0 +1,16 @@
+{
+  "job_run_id": 2590,
+  "runtime_job_id": "dagen/dagen-dbt-test-midas-denormalized-tran-1792466389-3bddf6db2294",
+  "status": "failed",
+  "workspace_id": 3,
+  "pipeline_id": "67",
+  "dbt_command": "build",
+  "extra_args": [
+    "--select",
+    "mart_denormalized_transactions"
+  ],
+  "started_at": null,
+  "completed_at": "2026-10-20T03:21:04",
+  "error_message": "dagen-dbt-test-midas-denormalized-tran-1792466389-3bddf6dblx55c/job exited with code 1. Driver log had no recognisable error signature \u2014 read the full log with search_remote_job_logs. (job condition: BackoffLimitExceeded: Job has reached the specified backoff limit)",
+  "persisted_at": "2026-10-20T03:21:09.788760+00:00"
+}

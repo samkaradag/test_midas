@@ -1,0 +1,383 @@
+[dagen-dbt 03:19:56] starting dbt runner
+[dagen-dbt 03:19:56] python=/usr/bin/python3 home=/work/home cwd=/opt/spark/work-dir
+[dagen-dbt 03:19:56] rewrote test_midas.dev.keyfile -> /work/project/keyfile.json
+[dagen-dbt 03:19:56] installing dbt packages: dbt-core, dbt-bigquery
+Collecting dbt-core
+  Downloading dbt_core-1.12.6-py3-none-any.whl (1.1 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 6.9 MB/s eta 0:00:00
+Collecting dbt-bigquery
+  Downloading dbt_bigquery-1.12.1-py3-none-any.whl (114 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 114.4/114.4 KB 14.3 MB/s eta 0:00:00
+Collecting pathspec<1.1,>=0.9
+  Downloading pathspec-1.0.4-py3-none-any.whl (55 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 55.2/55.2 KB 16.8 MB/s eta 0:00:00
+Collecting agate<1.15,>=1.7.0
+  Downloading agate-1.14.2-py3-none-any.whl (95 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 96.0/96.0 KB 15.3 MB/s eta 0:00:00
+Collecting click<9.0,>=8.3.0
+  Downloading click-8.5.0-py3-none-any.whl (125 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 125.3/125.3 KB 15.5 MB/s eta 0:00:00
+Requirement already satisfied: requests<3.0.0 in /usr/local/lib/python3.10/dist-packages (from dbt-core) (2.34.2)
+Collecting sqlparse<0.7.0,>=0.5.5
+  Downloading sqlparse-0.6.0-py3-none-any.whl (50 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.1/50.1 KB 21.9 MB/s eta 0:00:00
+Collecting dbt-core-experimental-parser<3,>=2.0.0b1
+  Downloading dbt_core_experimental_parser-2.0.8.tar.gz (4.8 kB)
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting snowplow-tracker<2.0,>=1.0.2
+  Downloading snowplow_tracker-1.1.0-py3-none-any.whl (44 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.1/44.1 KB 22.1 MB/s eta 0:00:00
+Collecting pydantic<3
+  Downloading pydantic-2.14.1-py3-none-any.whl (488 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 488.1/488.1 KB 12.2 MB/s eta 0:00:00
+Collecting dbt-protos<2.0,>=1.0.514
+  Downloading dbt_protos-1.0.607-py3-none-any.whl (295 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 295.5/295.5 KB 15.6 MB/s eta 0:00:00
+Requirement already satisfied: opentelemetry-api<2.0,>=1.26 in /usr/local/lib/python3.10/dist-packages (from dbt-core) (1.45.1)
+Collecting daff>=1.3.46
+  Downloading daff-1.4.2-py3-none-any.whl (144 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 144.9/144.9 KB 21.8 MB/s eta 0:00:00
+Collecting mashumaro[msgpack]<3.18,>=3.9
+  Downloading mashumaro-3.17-py3-none-any.whl (94 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 94.2/94.2 KB 22.2 MB/s eta 0:00:00
+Collecting dbt-extractor<=0.6,>=0.5.0
+  Downloading dbt_extractor-0.6.0-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (442 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 442.7/442.7 KB 15.6 MB/s eta 0:00:00
+Collecting dbt-common<2.0,>=1.37.5
+  Downloading dbt_common-1.39.0-py3-none-any.whl (89 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 89.1/89.1 KB 27.4 MB/s eta 0:00:00
+Collecting python-dotenv>=1.2
+  Downloading python_dotenv-1.2.4-py3-none-any.whl (23 kB)
+Collecting metricflow<1.0,>=0.213.0
+  Downloading metricflow-0.213.0-py3-none-any.whl (999 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 999.5/999.5 KB 17.9 MB/s eta 0:00:00
+Requirement already satisfied: pytz>=2015.7 in /usr/local/lib/python3.10/dist-packages (from dbt-core) (2026.5)
+Collecting networkx<4.0,>=2.3
+  Downloading networkx-3.4.2-py3-none-any.whl (1.7 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 22.3 MB/s eta 0:00:00
+Requirement already satisfied: protobuf<8.0,>=6.0 in /usr/local/lib/python3.10/dist-packages (from dbt-core) (7.36.1)
+Requirement already satisfied: pyyaml>=6.0 in /usr/local/lib/python3.10/dist-packages (from dbt-core) (6.0.3)
+Collecting packaging>20.9
+  Downloading packaging-26.3-py3-none-any.whl (129 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 130.0/130.0 KB 43.2 MB/s eta 0:00:00
+Requirement already satisfied: typing-extensions>=4.4 in /usr/local/lib/python3.10/dist-packages (from dbt-core) (4.16.0)
+Collecting dbt-adapters<2.0,>=1.24.5
+  Downloading dbt_adapters-1.24.5-py3-none-any.whl (177 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 177.3/177.3 KB 43.4 MB/s eta 0:00:00
+Collecting jinja2<4,>=3.1.3
+  Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.9/134.9 KB 43.5 MB/s eta 0:00:00
+Collecting jsonschema<5.0,>=4.19.1
+  Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.6/90.6 KB 70.3 MB/s eta 0:00:00
+Collecting google-cloud-bigquery[pandas]<4.0,>=3.0
+  Downloading google_cloud_bigquery-3.46.2-py3-none-any.whl (269 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 269.2/269.2 KB 40.0 MB/s eta 0:00:00
+Requirement already satisfied: google-api-core>=2.11.0 in /usr/local/lib/python3.10/dist-packages (from dbt-bigquery) (2.42.0)
+Collecting google-cloud-aiplatform>=1.148.0
+  Downloading google_cloud_aiplatform-2.5.0-py2.py3-none-any.whl (9.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.5/9.5 MB 41.8 MB/s eta 0:00:00
+Collecting nbformat>=5.10.4
+  Downloading nbformat-5.11.1-py3-none-any.whl (79 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.8/79.8 KB 454.6 MB/s eta 0:00:00
+Collecting dbt-core
+  Downloading dbt_core-1.13.0b1-py3-none-any.whl (1.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 77.0 MB/s eta 0:00:00
+Collecting google-cloud-dataproc~=5.0
+  Downloading google_cloud_dataproc-5.32.0-py3-none-any.whl (487 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 487.1/487.1 KB 110.2 MB/s eta 0:00:00
+Collecting google-cloud-storage<3.2,>=2.4
+  Downloading google_cloud_storage-3.1.1-py3-none-any.whl (175 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 175.5/175.5 KB 533.4 MB/s eta 0:00:00
+Requirement already satisfied: google-auth>=2.29.0 in /usr/local/lib/python3.10/dist-packages (from dbt-bigquery) (2.62.0)
+Collecting python-slugify>=1.2.1
+  Downloading python_slugify-9.1.3-py3-none-any.whl (16 kB)
+Collecting parsedatetime!=2.5,>=2.1
+  Downloading parsedatetime-2.6-py3-none-any.whl (42 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.5/42.5 KB 332.6 MB/s eta 0:00:00
+Collecting Babel>=2.0
+  Downloading babel-2.18.0-py3-none-any.whl (10.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.2/10.2 MB 88.5 MB/s eta 0:00:00
+Collecting isodate>=0.5.4
+  Downloading isodate-0.7.2-py3-none-any.whl (22 kB)
+Collecting pytimeparse>=1.1.5
+  Downloading pytimeparse-1.1.8-py2.py3-none-any.whl (10.0 kB)
+Collecting leather>=0.3.2
+  Downloading leather-0.4.1-py3-none-any.whl (30 kB)
+Collecting protobuf<8.0,>=6.0
+  Downloading protobuf-6.33.6-cp39-abi3-manylinux2014_x86_64.whl (323 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 323.4/323.4 KB 396.5 MB/s eta 0:00:00
+Requirement already satisfied: python-dateutil<3.0,>=2.0 in /usr/local/lib/python3.10/dist-packages (from dbt-common<2.0,>=1.37.5->dbt-core) (2.9.0.post0)
+Collecting deepdiff<9.0,>=7.0
+  Downloading deepdiff-8.6.2-py3-none-any.whl (91 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 92.0/92.0 KB 449.9 MB/s eta 0:00:00
+Collecting colorama<0.5,>=0.3.9
+  Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Collecting agate<1.15,>=1.7.0
+  Downloading agate-1.9.1-py2.py3-none-any.whl (95 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 95.1/95.1 KB 452.8 MB/s eta 0:00:00
+Requirement already satisfied: googleapis-common-protos<2.0.0,>=1.69.2 in /usr/local/lib/python3.10/dist-packages (from google-api-core>=2.11.0->dbt-bigquery) (1.75.3)
+Requirement already satisfied: proto-plus<2.0.0,>=1.26.1 in /usr/local/lib/python3.10/dist-packages (from google-api-core>=2.11.0->dbt-bigquery) (1.29.0)
+Requirement already satisfied: cryptography>=38.0.3 in /usr/local/lib/python3.10/dist-packages (from google-auth>=2.29.0->dbt-bigquery) (50.0.2)
+Requirement already satisfied: pyasn1-modules>=0.2.1 in /usr/local/lib/python3.10/dist-packages (from google-auth>=2.29.0->dbt-bigquery) (0.4.2)
+Requirement already satisfied: certifi>=2023.7.22 in /usr/local/lib/python3.10/dist-packages (from google-cloud-aiplatform>=1.148.0->dbt-bigquery) (2026.10.18)
+Collecting google-genai<3.0.0,>=1.66.0
+  Downloading google_genai-2.31.0-py3-none-any.whl (1.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 163.0 MB/s eta 0:00:00
+Collecting google-cloud-resource-manager<3.0.0,>=1.3.3
+  Downloading google_cloud_resource_manager-1.19.0-py3-none-any.whl (395 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 395.2/395.2 KB 239.5 MB/s eta 0:00:00
+Collecting docstring_parser<1
+  Downloading docstring_parser-0.18.0-py3-none-any.whl (22 kB)
+Requirement already satisfied: google-resumable-media<3.0.0,>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (2.11.0)
+Requirement already satisfied: google-cloud-core<3.0.0,>=2.4.1 in /usr/local/lib/python3.10/dist-packages (from google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (2.8.0)
+Requirement already satisfied: pyarrow>=3.0.0 in /usr/local/lib/python3.10/dist-packages (from google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (25.0.1)
+Collecting db-dtypes<2.0.0,>=1.0.4
+  Downloading db_dtypes-1.8.0-py3-none-any.whl (18 kB)
+Requirement already satisfied: grpcio<2.0.0,>=1.59.0 in /usr/local/lib/python3.10/dist-packages (from google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (1.83.1)
+Collecting pandas-gbq>=0.26.1
+  Downloading pandas_gbq-0.35.2-py3-none-any.whl (51 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.9/51.9 KB 343.3 MB/s eta 0:00:00
+Requirement already satisfied: pandas>=1.3.0 in /usr/local/lib/python3.10/dist-packages (from google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (2.3.3)
+Requirement already satisfied: grpc-google-iam-v1<1.0.0,>=0.14.2 in /usr/local/lib/python3.10/dist-packages (from google-cloud-dataproc~=5.0->dbt-bigquery) (0.14.5)
+Requirement already satisfied: google-crc32c<2.0.0,>=1.1.3 in /usr/local/lib/python3.10/dist-packages (from google-cloud-storage<3.2,>=2.4->dbt-bigquery) (1.9.0)
+Collecting MarkupSafe>=2.0
+  Downloading markupsafe-3.0.4-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (20 kB)
+Collecting jsonschema-specifications>=2023.03.6
+  Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl (18 kB)
+Requirement already satisfied: attrs>=22.2.0 in /usr/local/lib/python3.10/dist-packages (from jsonschema<5.0,>=4.19.1->dbt-core) (26.1.0)
+Collecting referencing>=0.28.4
+  Downloading referencing-0.37.0-py3-none-any.whl (26 kB)
+Collecting rpds-py>=0.25.0
+  Downloading rpds_py-0.30.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (390 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 390.5/390.5 KB 246.4 MB/s eta 0:00:00
+Collecting msgpack>=0.5.6
+  Downloading msgpack-1.2.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (459 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 459.8/459.8 KB 229.3 MB/s eta 0:00:00
+Collecting rapidfuzz<4.0,>=3.0
+  Downloading rapidfuzz-3.14.5-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (3.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 120.0 MB/s eta 0:00:00
+Collecting tabulate>=0.8.9
+  Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+Collecting importlib-metadata>=4.0
+  Downloading importlib_metadata-9.0.1-py3-none-any.whl (27 kB)
+Collecting sqlglot>=20.0.0
+  Downloading sqlglot-30.23.0-py3-none-any.whl (783 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 783.7/783.7 KB 193.0 MB/s eta 0:00:00
+Collecting more-itertools<11.0,>=10.0.0
+  Downloading more_itertools-10.8.0-py3-none-any.whl (69 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.7/69.7 KB 396.4 MB/s eta 0:00:00
+Collecting fastjsonschema>=2.15
+  Downloading fastjsonschema-2.22.2-py3-none-any.whl (27 kB)
+Collecting traitlets>=5.1
+  Downloading traitlets-5.16.1-py3-none-any.whl (86 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 86.2/86.2 KB 453.8 MB/s eta 0:00:00
+Collecting jupyter-core!=5.0.*,>=4.12
+  Downloading jupyter_core-5.9.1-py3-none-any.whl (29 kB)
+Collecting typing-inspection>=0.4.4
+  Downloading typing_inspection-0.4.4-py3-none-any.whl (14 kB)
+Collecting pydantic-core==2.50.1
+  Downloading pydantic_core-2.50.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 140.5 MB/s eta 0:00:00
+Collecting annotated-types>=0.6.0
+  Downloading annotated_types-0.8.0-py3-none-any.whl (13 kB)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0->dbt-core) (3.5.2)
+Requirement already satisfied: urllib3<3,>=1.26 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0->dbt-core) (2.8.0)
+Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.10/dist-packages (from requests<3.0.0->dbt-core) (3.20)
+Requirement already satisfied: cffi>=2.0.0 in /usr/local/lib/python3.10/dist-packages (from cryptography>=38.0.3->google-auth>=2.29.0->dbt-bigquery) (2.1.1)
+Requirement already satisfied: numpy<=2.2.6,>=1.24.0 in /usr/local/lib/python3.10/dist-packages (from db-dtypes<2.0.0,>=1.0.4->google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (2.2.6)
+Collecting orderly-set<6,>=5.4.1
+  Downloading orderly_set-5.5.0-py3-none-any.whl (13 kB)
+Requirement already satisfied: grpcio-status<2.0.0,>=1.59.0 in /usr/local/lib/python3.10/dist-packages (from google-api-core>=2.11.0->dbt-bigquery) (1.83.1)
+Collecting httpx<1.0.0,>=0.28.1
+  Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 KB 410.3 MB/s eta 0:00:00
+Collecting tenacity<9.2.0,>=8.2.3
+  Downloading tenacity-9.1.4-py3-none-any.whl (28 kB)
+Collecting distro<2,>=1.7.0
+  Downloading distro-1.9.0-py3-none-any.whl (20 kB)
+Collecting sniffio
+  Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+Collecting anyio<5.0.0,>=4.8.0
+  Downloading anyio-4.15.1-py3-none-any.whl (132 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 KB 471.6 MB/s eta 0:00:00
+Collecting websockets<17.0,>=13.0.0
+  Downloading websockets-16.1.1-cp310-cp310-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (186 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 186.0/186.0 KB 419.0 MB/s eta 0:00:00
+Collecting zipp>=3.20
+  Downloading zipp-4.1.1-py3-none-any.whl (10 kB)
+Collecting platformdirs>=2.5
+  Downloading platformdirs-4.12.4-py3-none-any.whl (32 kB)
+Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.10/dist-packages (from pandas>=1.3.0->google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (2026.5)
+Collecting pydata-google-auth>=1.5.0
+  Downloading pydata_google_auth-1.9.1-py2.py3-none-any.whl (15 kB)
+Requirement already satisfied: setuptools in /usr/lib/python3/dist-packages (from pandas-gbq>=0.26.1->google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (59.6.0)
+Collecting psutil>=5.9.8
+  Downloading psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (155 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 155.6/155.6 KB 487.5 MB/s eta 0:00:00
+Requirement already satisfied: google-auth-oauthlib>=0.7.0 in /usr/local/lib/python3.10/dist-packages (from pandas-gbq>=0.26.1->google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (1.5.0)
+Requirement already satisfied: pyasn1<0.7.0,>=0.6.1 in /usr/local/lib/python3.10/dist-packages (from pyasn1-modules>=0.2.1->google-auth>=2.29.0->dbt-bigquery) (0.6.4)
+Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.10/dist-packages (from python-dateutil<3.0,>=2.0->dbt-common<2.0,>=1.37.5->dbt-core) (1.17.0)
+Collecting text-unidecode>=1.3
+  Downloading text_unidecode-1.3-py2.py3-none-any.whl (78 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.2/78.2 KB 486.1 MB/s eta 0:00:00
+Collecting exceptiongroup>=1.0.2
+  Downloading exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.10/dist-packages (from cffi>=2.0.0->cryptography>=38.0.3->google-auth>=2.29.0->dbt-bigquery) (3.11)
+Requirement already satisfied: requests-oauthlib>=0.7.0 in /usr/local/lib/python3.10/dist-packages (from google-auth-oauthlib>=0.7.0->pandas-gbq>=0.26.1->google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (2.0.0)
+Collecting httpcore==1.*
+  Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 KB 418.5 MB/s eta 0:00:00
+Collecting h11>=0.16
+  Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Requirement already satisfied: oauthlib>=3.0.0 in /usr/local/lib/python3.10/dist-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib>=0.7.0->pandas-gbq>=0.26.1->google-cloud-bigquery[pandas]<4.0,>=3.0->dbt-bigquery) (4.0.0)
+Building wheels for collected packages: dbt-core-experimental-parser
+  Building wheel for dbt-core-experimental-parser (pyproject.toml): started
+  Building wheel for dbt-core-experimental-parser (pyproject.toml): finished with status 'done'
+  Created wheel for dbt-core-experimental-parser: filename=dbt_core_experimental_parser-2.0.8-py3-none-manylinux_2_28_x86_64.whl size=55496990 sha256=2186d331522b2a8a0f09d2f5c81ff5f1a433160ad7cd212906dccc0d4951d2a1
+  Stored in directory: /tmp/pip-ephem-wheel-cache-yt9q9lxh/wheels/13/81/2d/b1080c0198f454dbef932811a111a639beedefdb71bfecea3f
+Successfully built dbt-core-experimental-parser
+Installing collected packages: text-unidecode, pytimeparse, parsedatetime, leather, daff, zipp, websockets, typing-inspection, traitlets, tenacity, tabulate, sqlparse, sqlglot, sniffio, rpds-py, rapidfuzz, python-slugify, python-dotenv, pydantic-core, psutil, protobuf, platformdirs, pathspec, packaging, orderly-set, networkx, msgpack, more-itertools, mashumaro, MarkupSafe, isodate, h11, fastjsonschema, exceptiongroup, docstring_parser, distro, dbt-extractor, dbt-core-experimental-parser, colorama, click, Babel, annotated-types, snowplow-tracker, referencing, pydantic, jupyter-core, jinja2, importlib-metadata, httpcore, deepdiff, dbt-protos, anyio, agate, jsonschema-specifications, httpx, db-dtypes, jsonschema, pydata-google-auth, nbformat, metricflow, google-genai, dbt-common, google-cloud-storage, google-cloud-resource-manager, google-cloud-dataproc, google-cloud-bigquery, dbt-adapters, pandas-gbq, google-cloud-aiplatform, dbt-core, dbt-bigquery
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+gcsfs 2026.8.0 requires google-cloud-storage>=3.11.0, but you have google-cloud-storage 3.1.1 which is incompatible.
+Successfully installed Babel-2.18.0 MarkupSafe-3.0.4 agate-1.9.1 annotated-types-0.8.0 anyio-4.15.1 click-8.5.0 colorama-0.4.6 daff-1.4.2 db-dtypes-1.8.0 dbt-adapters-1.24.5 dbt-bigquery-1.12.1 dbt-common-1.39.0 dbt-core-1.12.6 dbt-core-experimental-parser-2.0.8 dbt-extractor-0.6.0 dbt-protos-1.0.607 deepdiff-8.6.2 distro-1.9.0 docstring_parser-0.18.0 exceptiongroup-1.3.1 fastjsonschema-2.22.2 google-cloud-aiplatform-2.5.0 google-cloud-bigquery-3.46.2 google-cloud-dataproc-5.32.0 google-cloud-resource-manager-1.19.0 google-cloud-storage-3.1.1 google-genai-2.31.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 importlib-metadata-9.0.1 isodate-0.7.2 jinja2-3.1.6 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 jupyter-core-5.9.1 leather-0.4.1 mashumaro-3.17 metricflow-0.213.0 more-itertools-10.8.0 msgpack-1.2.3 nbformat-5.11.1 networkx-3.4.2 orderly-set-5.5.0 packaging-26.3 pandas-gbq-0.35.2 parsedatetime-2.6 pathspec-1.0.4 platformdirs-4.12.4 protobuf-6.33.6 psutil-7.2.2 pydantic-2.14.1 pydantic-core-2.50.1 pydata-google-auth-1.9.1 python-dotenv-1.2.4 python-slugify-9.1.3 pytimeparse-1.1.8 rapidfuzz-3.14.5 referencing-0.37.0 rpds-py-0.30.0 sniffio-1.3.1 snowplow-tracker-1.1.0 sqlglot-30.23.0 sqlparse-0.6.0 tabulate-0.10.0 tenacity-9.1.4 text-unidecode-1.3 traitlets-5.16.1 typing-inspection-0.4.4 websockets-16.1.1 zipp-4.1.1
+[dagen-dbt 03:20:31] running: /work/home/.local/bin/dbt parse --profiles-dir /work/project --project-dir /work/project --no-version-check
+[0m03:20:32  Running with dbt=1.12.6
+/usr/local/lib/python3.10/dist-packages/google/api_core/_python_version_support.py:223: FutureWarning: You are using a non-supported Python version (3.10.12). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.11, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/usr/local/lib/python3.10/dist-packages/google/api_core/_python_version_support.py:223: FutureWarning: You are using a non-supported Python version (3.10.12). Google will not post any further updates to google.cloud.bigquery supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.11, and then update google.cloud.bigquery.
+  warnings.warn(message, FutureWarning)
+/usr/local/lib/python3.10/dist-packages/google/api_core/_python_version_support.py:223: FutureWarning: You are using a non-supported Python version (3.10.12). Google will not post any further updates to google.cloud.dataproc_v1 supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.11, and then update google.cloud.dataproc_v1.
+  warnings.warn(message, FutureWarning)
+[0m03:20:33  Registered adapter: bigquery=1.12.1
+[0m03:20:34  Unable to do partial parsing because of a version mismatch
+[0m03:20:35  [[33mWARNING[0m][MissingArgumentsPropertyInGenericTestDeprecation]: Deprecated
+functionality
+Found top-level arguments to test `accepted_values` defined on 'stg_customers'
+in package 'test_midas' (models/schema.yml). Arguments to generic tests should
+be nested under the `arguments` property.
+[0m03:20:35  [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 2 unused configuration paths:
+- seeds.test_midas
+- snapshots.test_midas
+[0m03:20:35  Performance info: /work/project/target/perf_info.json
+[0m03:20:35  [[33mWARNING[0m][DeprecationsSummary]: Deprecated functionality
+Summary of encountered deprecations:
+- MissingArgumentsPropertyInGenericTestDeprecation: 24 occurrences
+To see all deprecation instances instead of just the first occurrence of each,
+run command again with the `--show-all-deprecations` flag. You may also need to
+run with `--no-partial-parse` as some deprecations are only encountered during
+parsing.
+[dagen-dbt 03:20:36] dbt exited with rc=0
+[dagen-dbt 03:20:36] running: /work/home/.local/bin/dbt build --select mart_denormalized_transactions --profiles-dir /work/project --project-dir /work/project
+[0m03:20:37  Running with dbt=1.12.6
+/usr/local/lib/python3.10/dist-packages/google/api_core/_python_version_support.py:223: FutureWarning: You are using a non-supported Python version (3.10.12). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.11, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/usr/local/lib/python3.10/dist-packages/google/api_core/_python_version_support.py:223: FutureWarning: You are using a non-supported Python version (3.10.12). Google will not post any further updates to google.cloud.bigquery supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.11, and then update google.cloud.bigquery.
+  warnings.warn(message, FutureWarning)
+/usr/local/lib/python3.10/dist-packages/google/api_core/_python_version_support.py:223: FutureWarning: You are using a non-supported Python version (3.10.12). Google will not post any further updates to google.cloud.dataproc_v1 supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.11, and then update google.cloud.dataproc_v1.
+  warnings.warn(message, FutureWarning)
+[0m03:20:38  Registered adapter: bigquery=1.12.1
+[0m03:20:38  [[33mWARNING[0m]: Configuration paths exist in your dbt_project.yml file which do not apply to any resources.
+There are 2 unused configuration paths:
+- seeds.test_midas
+- snapshots.test_midas
+[0m03:20:38  Found 16 models, 113 data tests, 9 sources, 561 macros
+[0m03:20:38  
+[0m03:20:38  Concurrency: 4 threads (target='dev')
+[0m03:20:38  
+[0m03:20:39  1 of 33 START sql table model payments_v1_payments_v1.mart_denormalized_transactions  [RUN]
+[0m03:20:43  1 of 33 OK created sql table model payments_v1_payments_v1.mart_denormalized_transactions  [[32mCREATE TABLE (21.0 rows, 693.8 MiB processed)[0m in 3.79s]
+[0m03:20:43  2 of 33 START test accepted_values_mart_denormalized_transactions_transaction_status__pending__completed__failed__cancelled  [RUN]
+[0m03:20:43  3 of 33 START test mart_denormalized_transactions_count_reconciliation ......... [RUN]
+[0m03:20:43  4 of 33 START test mart_denormalized_transactions_exact_grain .................. [RUN]
+[0m03:20:43  5 of 33 START test mart_denormalized_transactions_ledger_balanced .............. [RUN]
+[0m03:20:45  4 of 33 PASS mart_denormalized_transactions_exact_grain ........................ [[32mPASS[0m in 1.49s]
+[0m03:20:45  6 of 33 START test mart_denormalized_transactions_no_future_timestamps ......... [RUN]
+[0m03:20:45  5 of 33 FAIL 21 mart_denormalized_transactions_ledger_balanced ................. [[31mFAIL 21[0m in 1.66s]
+[0m03:20:45  7 of 33 START test mart_denormalized_transactions_nonnegative_amounts .......... [RUN]
+[0m03:20:45  2 of 33 PASS accepted_values_mart_denormalized_transactions_transaction_status__pending__completed__failed__cancelled  [[32mPASS[0m in 1.78s]
+[0m03:20:45  8 of 33 START test mart_denormalized_transactions_refunds_within_amount ........ [RUN]
+[0m03:20:46  3 of 33 PASS mart_denormalized_transactions_count_reconciliation ............... [[32mPASS[0m in 2.32s]
+[0m03:20:46  9 of 33 START test mart_denormalized_transactions_source_reconciliation ........ [RUN]
+[0m03:20:46  6 of 33 PASS mart_denormalized_transactions_no_future_timestamps ............... [[32mPASS[0m in 1.24s]
+[0m03:20:46  10 of 33 START test mart_denormalized_transactions_valid_flags ................. [RUN]
+[0m03:20:46  8 of 33 PASS mart_denormalized_transactions_refunds_within_amount .............. [[32mPASS[0m in 1.30s]
+[0m03:20:46  11 of 33 START test not_null_mart_denormalized_transactions_creditor_customer_id  [RUN]
+[0m03:20:47  7 of 33 FAIL 10 mart_denormalized_transactions_nonnegative_amounts ............. [[31mFAIL 10[0m in 1.72s]
+[0m03:20:47  12 of 33 START test not_null_mart_denormalized_transactions_currency ........... [RUN]
+[0m03:20:47  10 of 33 FAIL 21 mart_denormalized_transactions_valid_flags .................... [[31mFAIL 21[0m in 1.13s]
+[0m03:20:47  13 of 33 START test not_null_mart_denormalized_transactions_dbt_updated_at ..... [RUN]
+[0m03:20:48  11 of 33 PASS not_null_mart_denormalized_transactions_creditor_customer_id ..... [[32mPASS[0m in 1.25s]
+[0m03:20:48  14 of 33 START test not_null_mart_denormalized_transactions_debtor_customer_id . [RUN]
+[0m03:20:48  9 of 33 PASS mart_denormalized_transactions_source_reconciliation .............. [[32mPASS[0m in 2.06s]
+[0m03:20:48  15 of 33 START test not_null_mart_denormalized_transactions_dispute_count ...... [RUN]
+[0m03:20:48  12 of 33 PASS not_null_mart_denormalized_transactions_currency ................. [[32mPASS[0m in 1.16s]
+[0m03:20:48  16 of 33 START test not_null_mart_denormalized_transactions_fee_count .......... [RUN]
+[0m03:20:48  13 of 33 PASS not_null_mart_denormalized_transactions_dbt_updated_at ........... [[32mPASS[0m in 1.25s]
+[0m03:20:48  17 of 33 START test not_null_mart_denormalized_transactions_has_ledger ......... [RUN]
+[0m03:20:49  16 of 33 PASS not_null_mart_denormalized_transactions_fee_count ................ [[32mPASS[0m in 1.14s]
+[0m03:20:49  18 of 33 START test not_null_mart_denormalized_transactions_is_ledger_balanced . [RUN]
+[0m03:20:49  14 of 33 PASS not_null_mart_denormalized_transactions_debtor_customer_id ....... [[32mPASS[0m in 1.40s]
+[0m03:20:49  19 of 33 START test not_null_mart_denormalized_transactions_is_leg_count_consistent  [RUN]
+[0m03:20:49  15 of 33 PASS not_null_mart_denormalized_transactions_dispute_count ............ [[32mPASS[0m in 1.36s]
+[0m03:20:49  20 of 33 START test not_null_mart_denormalized_transactions_leg_count .......... [RUN]
+[0m03:20:49  17 of 33 PASS not_null_mart_denormalized_transactions_has_ledger ............... [[32mPASS[0m in 1.09s]
+[0m03:20:49  21 of 33 START test not_null_mart_denormalized_transactions_net_transaction_amount  [RUN]
+[0m03:20:50  19 of 33 PASS not_null_mart_denormalized_transactions_is_leg_count_consistent .. [[32mPASS[0m in 1.18s]
+[0m03:20:50  22 of 33 START test not_null_mart_denormalized_transactions_payment_method_id .. [RUN]
+[0m03:20:50  20 of 33 PASS not_null_mart_denormalized_transactions_leg_count ................ [[32mPASS[0m in 1.27s]
+[0m03:20:50  23 of 33 START test not_null_mart_denormalized_transactions_refund_count ....... [RUN]
+[0m03:20:50  18 of 33 PASS not_null_mart_denormalized_transactions_is_ledger_balanced ....... [[32mPASS[0m in 1.33s]
+[0m03:20:50  24 of 33 START test not_null_mart_denormalized_transactions_total_fee_amount ... [RUN]
+[0m03:20:51  21 of 33 PASS not_null_mart_denormalized_transactions_net_transaction_amount ... [[32mPASS[0m in 1.29s]
+[0m03:20:51  25 of 33 START test not_null_mart_denormalized_transactions_total_refund_amount  [RUN]
+[0m03:20:52  24 of 33 PASS not_null_mart_denormalized_transactions_total_fee_amount ......... [[32mPASS[0m in 1.39s]
+[0m03:20:52  26 of 33 START test not_null_mart_denormalized_transactions_transaction_amount . [RUN]
+[0m03:20:52  22 of 33 PASS not_null_mart_denormalized_transactions_payment_method_id ........ [[32mPASS[0m in 1.61s]
+[0m03:20:52  27 of 33 START test not_null_mart_denormalized_transactions_transaction_created_at  [RUN]
+[0m03:20:52  23 of 33 PASS not_null_mart_denormalized_transactions_refund_count ............. [[32mPASS[0m in 1.55s]
+[0m03:20:52  28 of 33 START test not_null_mart_denormalized_transactions_transaction_id ..... [RUN]
+[0m03:20:52  25 of 33 PASS not_null_mart_denormalized_transactions_total_refund_amount ...... [[32mPASS[0m in 1.12s]
+[0m03:20:52  29 of 33 START test not_null_mart_denormalized_transactions_transaction_status . [RUN]
+[0m03:20:53  26 of 33 PASS not_null_mart_denormalized_transactions_transaction_amount ....... [[32mPASS[0m in 1.05s]
+[0m03:20:53  30 of 33 START test relationships_mart_denormalized_transactions_creditor_customer_id__customer_id__source_raw_data_customers_  [RUN]
+[0m03:20:53  27 of 33 PASS not_null_mart_denormalized_transactions_transaction_created_at ... [[32mPASS[0m in 1.32s]
+[0m03:20:53  31 of 33 START test relationships_mart_denormalized_transactions_debtor_customer_id__customer_id__source_raw_data_customers_  [RUN]
+[0m03:20:53  28 of 33 PASS not_null_mart_denormalized_transactions_transaction_id ........... [[32mPASS[0m in 1.38s]
+[0m03:20:53  32 of 33 START test relationships_mart_denormalized_transactions_payment_method_id__payment_method_id__source_raw_data_payment_methods_  [RUN]
+[0m03:20:53  29 of 33 PASS not_null_mart_denormalized_transactions_transaction_status ....... [[32mPASS[0m in 1.48s]
+[0m03:20:53  33 of 33 START test unique_mart_denormalized_transactions_transaction_id ....... [RUN]
+[0m03:20:54  30 of 33 PASS relationships_mart_denormalized_transactions_creditor_customer_id__customer_id__source_raw_data_customers_  [[32mPASS[0m in 1.56s]
+[0m03:20:54  33 of 33 PASS unique_mart_denormalized_transactions_transaction_id ............. [[32mPASS[0m in 1.00s]
+[0m03:20:55  31 of 33 PASS relationships_mart_denormalized_transactions_debtor_customer_id__customer_id__source_raw_data_customers_  [[32mPASS[0m in 1.56s]
+[0m03:20:55  32 of 33 PASS relationships_mart_denormalized_transactions_payment_method_id__payment_method_id__source_raw_data_payment_methods_  [[32mPASS[0m in 1.60s]
+[0m03:20:55  
+[0m03:20:55  Finished running 1 table model, 32 data tests in 0 hours 0 minutes and 16.59 seconds (16.59s).
+[0m03:20:55  
+[0m03:20:55  [31mCompleted with 3 errors, 0 partial successes, and 0 warnings:[0m
+[0m03:20:55  
+[0m03:20:55  [[31mERROR[0m]: in test mart_denormalized_transactions_ledger_balanced (tests/business_logic/mart_denormalized_transactions_ledger_balanced.sql)
+[0m03:20:55    Got 21 results, configured to fail if != 0
+[0m03:20:55  
+[0m03:20:55    compiled code at target/compiled/test_midas/tests/business_logic/mart_denormalized_transactions_ledger_balanced.sql
+[0m03:20:55  
+[0m03:20:55  [[31mERROR[0m]: in test mart_denormalized_transactions_nonnegative_amounts (tests/business_logic/mart_denormalized_transactions_nonnegative_amounts.sql)
+[0m03:20:55    Got 10 results, configured to fail if != 0
+[0m03:20:55  
+[0m03:20:55    compiled code at target/compiled/test_midas/tests/business_logic/mart_denormalized_transactions_nonnegative_amounts.sql
+[0m03:20:55  
+[0m03:20:55  [[31mERROR[0m]: in test mart_denormalized_transactions_valid_flags (tests/business_logic/mart_denormalized_transactions_valid_flags.sql)
+[0m03:20:55    Got 21 results, configured to fail if != 0
+[0m03:20:55  
+[0m03:20:55    compiled code at target/compiled/test_midas/tests/business_logic/mart_denormalized_transactions_valid_flags.sql
+[0m03:20:55  
+[0m03:20:55  Done. PASS=30 WARN=0 ERROR=3 SKIP=0 NO-OP=0 REUSED=0 TOTAL=33
+[dagen-dbt 03:20:55] dbt exited with rc=1
+[dagen] compiled output collected out-of-band
+[dagen-dbt 03:20:55] published compiled output (276635 bytes, sha256=5bf18c67de89)
