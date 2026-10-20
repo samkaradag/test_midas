@@ -25,8 +25,7 @@ with transactions_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'transactions') }}
-    where _ab_cdc_deleted_at is null
-      and transaction_id is not null
+    where transaction_id is not null
 ),
 transactions_current as (
     select * except(version_rank)
@@ -53,8 +52,7 @@ customers_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'customers') }}
-    where _ab_cdc_deleted_at is null
-      and customer_id is not null
+    where customer_id is not null
 ),
 customers_current as (
     select * except(version_rank)
@@ -79,8 +77,7 @@ payment_methods_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'payment_methods') }}
-    where _ab_cdc_deleted_at is null
-      and payment_method_id is not null
+    where payment_method_id is not null
 ),
 payment_methods_current as (
     select * except(version_rank)
@@ -106,8 +103,7 @@ refunds_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'refunds') }}
-    where _ab_cdc_deleted_at is null
-      and refund_id is not null
+    where refund_id is not null
 ),
 refunds_by_transaction as (
     select
@@ -142,8 +138,7 @@ disputes_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'disputes') }}
-    where _ab_cdc_deleted_at is null
-      and dispute_id is not null
+    where dispute_id is not null
 ),
 disputes_by_transaction as (
     select
@@ -175,8 +170,7 @@ fees_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'fees') }}
-    where _ab_cdc_deleted_at is null
-      and fee_id is not null
+    where fee_id is not null
 ),
 fees_by_transaction as (
     select
@@ -208,8 +202,7 @@ legs_ranked as (
                 _airbyte_raw_id desc
         ) as version_rank
     from {{ source('raw_data', 'transaction_legs') }}
-    where _ab_cdc_deleted_at is null
-      and leg_id is not null
+    where leg_id is not null
 ),
 legs_by_transaction as (
     select
